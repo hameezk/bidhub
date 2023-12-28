@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "742120428431",
+    "project_id": "bidhub-16fe8",
+    "storage_bucket": "bidhub-16fe8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:742120428431:android:9393652291de0d818cb1fa",
+        "android_client_info": {
+          "package_name": "com.example.bidhub"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZs636-czJ99P8r9JufzwFUwGrDHqeXC0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
