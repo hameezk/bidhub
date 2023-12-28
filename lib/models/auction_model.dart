@@ -22,7 +22,7 @@ class AuctionModel {
   String? engineCapacity;
   String? bodytype;
   String? addedOn;
-  Map? features;
+  List? features;
   List? bids;
   bool? isActive;
   String? winingBid;
@@ -74,7 +74,7 @@ class AuctionModel {
     engineCapacity = map["engineCapacity"];
     bodytype = map["bodytype"];
     addedOn = map["addedOn"];
-    features = map["features"];
+    // features = map["features"];
     startDate = map["startDate"];
     bids = map["bids"];
     isActive = map["isActive"];
@@ -103,30 +103,80 @@ class AuctionModel {
       "engineCapacity": engineCapacity,
       "bodytype": bodytype,
       "addedOn": addedOn,
-      "features": features,
+      // "features": features,
       "bids": bids,
       "isActive": isActive,
       "winingBid": winingBid,
     };
   }
 
-  static Map demoFeatures = {
-    'ABS': true,
-    'AM/FM Radio': true,
-    'Air Bags': true,
-    'Air Conditioning': true,
-    'Alloy Rims': true,
-    'CD Player': true,
-    'Cruise Control': true,
-    'Immobilizer Key': true,
-    'Keyless Entry': true,
-    'Power Locks': true,
-    'Power Mirrors': true,
-    'Power Steering': true,
-    'Power Windows': true,
-    'Sun Roof': true,
-  };
-
+  static List demoFeatures = [
+    {
+      'feature': 'ABS',
+      'icon': '',
+      'isavailable': true,
+    },
+    {
+      'feature': 'AM/FM Radio',
+      'icon': '',
+      'isavailable': true,
+    },
+    {
+      'feature': 'Air Bags',
+      'icon': '',
+      'isavailable': true,
+    },
+    {
+      'feature': 'Air Conditioning',
+      'icon': '',
+      'isavailable': true,
+    },
+    {
+      'feature': 'Alloy Rims',
+      'icon': '',
+      'isavailable': true,
+    },
+    {
+      'feature': 'CD Player',
+      'icon': '',
+      'isavailable': true,
+    },
+    {
+      'feature': 'Cruise Control',
+      'icon': '',
+      'isavailable': true,
+    },
+    {
+      'feature': 'Immobilizer Key',
+      'icon': '',
+      'isavailable': true,
+    },
+    {
+      'feature': 'Keyless Entry',
+      'icon': '',
+      'isavailable': true,
+    },
+    {
+      'feature': 'Power Locks',
+      'icon': '',
+      'isavailable': true,
+    },
+    {
+      'feature': 'Power Mirrors',
+      'icon': '',
+      'isavailable': true,
+    },
+    {
+      'feature': 'Power Windows',
+      'icon': '',
+      'isavailable': true,
+    },
+    {
+      'feature': 'Sun Roof',
+      'icon': '',
+      'isavailable': true,
+    },
+  ];
   static List<AuctionModel> demoBids = [
     AuctionModel(
       id: '1',

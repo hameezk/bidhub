@@ -1,12 +1,12 @@
 import 'package:bidhub/config/colors.dart';
-import 'package:bidhub/config/navigate.dart';
 import 'package:bidhub/config/size.dart';
-import 'package:bidhub/models/offer_model.dart';
+import 'package:bidhub/models/auction_model.dart';
 import 'package:bidhub/models/user_model.dart';
-import 'package:bidhub/screens/profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import '../config/bottombar.dart';
 
 class HomeScreenSeller extends StatefulWidget {
   const HomeScreenSeller({super.key});
@@ -193,9 +193,10 @@ class _HomeScreenState extends State<HomeScreenSeller> {
                                           .toLowerCase()
                                           .contains(searchKey)) {
                                         return buildAuctionCard(
-                                            auctionModel,
-                                            (index ==
-                                                dataSnapshot.docs.length - 1));
+                                          auctionModel,
+                                          (index ==
+                                              dataSnapshot.docs.length - 1),
+                                        );
                                       } else {
                                         return Container();
                                       }
@@ -235,7 +236,7 @@ class _HomeScreenState extends State<HomeScreenSeller> {
               ),
             ],
           ),
-          buildNavBar(context),
+          buildNavBar(context, 0),
         ],
       ),
     );
@@ -333,79 +334,6 @@ class _HomeScreenState extends State<HomeScreenSeller> {
               )
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Positioned buildNavBar(BuildContext context) {
-    return Positioned(
-      bottom: 25,
-      right: 15,
-      left: 15,
-      child: Container(
-        height: 90,
-        width: width(context) * 0.8,
-        decoration: BoxDecoration(
-            color: containerColor.withOpacity(0.7),
-            borderRadius: BorderRadius.circular(20)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(1000),
-                color: textColorLight,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(0.0),
-                child: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.home,
-                    color: textColorDark,
-                    size: 28,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(1000),
-                color: textColorLight,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(0.0),
-                child: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.car_crash,
-                    color: textColorDark,
-                    size: 28,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(1000),
-                color: textColorLight,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(0.0),
-                child: IconButton(
-                  onPressed: () {
-                    navigate(context, const UserProfile());
-                  },
-                  icon: const Icon(
-                    Icons.person,
-                    color: textColorDark,
-                    size: 28,
-                  ),
-                ),
-              ),
-            ),
-          ],
         ),
       ),
     );

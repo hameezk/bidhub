@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
 navigate(BuildContext context, Widget nextScreen) {
-  Navigator.pushReplacement(
+  Navigator.push(
     context,
     PageTransition(
       alignment: Alignment.bottomCenter,
