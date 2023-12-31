@@ -4,21 +4,20 @@ import 'package:bidhub/config/size.dart';
 import 'package:bidhub/models/auction_model.dart';
 import 'package:bidhub/models/user_model.dart';
 import 'package:bidhub/screens/auction_details.dart';
-import 'package:bidhub/screens/user_profile_seller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../config/bottombar.dart';
 
-class HomeScreenSeller extends StatefulWidget {
-  const HomeScreenSeller({super.key});
+class HomeScreenCustomer extends StatefulWidget {
+  const HomeScreenCustomer({super.key});
 
   @override
-  State<HomeScreenSeller> createState() => _HomeScreenState();
+  State<HomeScreenCustomer> createState() => _HomeScreenCustomerState();
 }
 
-class _HomeScreenState extends State<HomeScreenSeller> {
+class _HomeScreenCustomerState extends State<HomeScreenCustomer> {
   TextEditingController searchController = TextEditingController();
   String searchKey = '';
   @override
@@ -74,8 +73,6 @@ class _HomeScreenState extends State<HomeScreenSeller> {
                                       GestureDetector(
                                         onTap: () {
                                           // AuctionModel.uploadDemoData(context);
-                                          navigate(context,
-                                              const UserProfileSeller());
                                         },
                                         child: SizedBox(
                                           height: height(context) * 0.1,
@@ -179,8 +176,7 @@ class _HomeScreenState extends State<HomeScreenSeller> {
                       child: StreamBuilder(
                         stream: FirebaseFirestore.instance
                             .collection("auction")
-                            .where("ownerId",
-                                isEqualTo: UserModel.loggedinUser!.id)
+                            .where("isActive", isEqualTo: true)
                             .snapshots(),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
@@ -188,7 +184,6 @@ class _HomeScreenState extends State<HomeScreenSeller> {
                             if (snapshot.hasData) {
                               QuerySnapshot dataSnapshot =
                                   snapshot.data as QuerySnapshot;
-
                               if (dataSnapshot.docs.isNotEmpty) {
                                 return ListView.builder(
                                     padding: EdgeInsets.zero,

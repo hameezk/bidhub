@@ -14,17 +14,18 @@ import 'package:intl/intl.dart';
 
 import '../config/size.dart';
 import '../models/auction_model.dart';
+import 'auction_details.dart';
 
-class UserProfile extends StatefulWidget {
-  const UserProfile({
+class UserProfileSeller extends StatefulWidget {
+  const UserProfileSeller({
     Key? key,
   }) : super(key: key);
 
   @override
-  _UserProfileState createState() => _UserProfileState();
+  _UserProfileSellerState createState() => _UserProfileSellerState();
 }
 
-class _UserProfileState extends State<UserProfile> {
+class _UserProfileSellerState extends State<UserProfileSeller> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -262,103 +263,109 @@ class _UserProfileState extends State<UserProfile> {
               ),
             ],
           ),
-          buildNavBar(context, 2),
+          buildNavBar(context, 20),
         ],
       ),
     );
   }
 
-  Padding buildAuctionCard(AuctionModel auctionModel, bool isLast) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: (isLast) ? 150.0 : 0),
+  buildAuctionCard(AuctionModel auctionModel, bool isLast) {
+    return GestureDetector(
+      onTap: () {
+        navigate(context, AuctionDetails(auctionModel: auctionModel));
+      },
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          height: 200,
-          width: width(context) * 0.9,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: containerColor,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Image.network(
-                        auctionModel.images![0],
-                        fit: BoxFit.cover,
-                        height: 130,
-                        width: width(context) * 0.4,
+        padding: EdgeInsets.only(bottom: (isLast) ? 150.0 : 0),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            height: 200,
+            width: width(context) * 0.9,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: containerColor,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: Image.network(
+                          auctionModel.images![0],
+                          fit: BoxFit.cover,
+                          height: 130,
+                          width: width(context) * 0.4,
+                        ),
                       ),
                     ),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: width(context) * 0.4,
-                        child: Text(
-                          auctionModel.carName ?? "",
-                          maxLines: 2,
-                          style: Theme.of(context)
-                              .textTheme
-                              .displaySmall!
-                              .copyWith(color: textColorLight),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 24.0),
-                            child: Text(
-                              auctionModel.location ?? "",
-                              maxLines: 1,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .displaySmall!
-                                  .copyWith(color: textColorLight),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 18.0),
-                          child: Icon(
-                            Icons.timer,
-                            color: textColorLight,
+                        SizedBox(
+                          width: width(context) * 0.4,
+                          child: Text(
+                            auctionModel.carName ?? "",
+                            maxLines: 2,
+                            style: Theme.of(context)
+                                .textTheme
+                                .displaySmall!
+                                .copyWith(color: textColorLight),
                           ),
                         ),
-                        Text(
-                          DateFormat('EEEE, MMM d, yyyy HH:mm').format(
-                              DateTime.parse(auctionModel.startDate ?? '')),
-                          maxLines: 1,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyLarge!
-                              .copyWith(color: textColorLight),
+                        Row(
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 24.0),
+                              child: Text(
+                                auctionModel.location ?? "",
+                                maxLines: 1,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .displaySmall!
+                                    .copyWith(color: textColorLight),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ],
                 ),
-              )
-            ],
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 18.0),
+                            child: Icon(
+                              Icons.timer,
+                              color: textColorLight,
+                            ),
+                          ),
+                          Text(
+                            DateFormat('EEEE, MMM d, yyyy HH:mm').format(
+                                DateTime.parse(auctionModel.startDate ?? '')),
+                            maxLines: 1,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge!
+                                .copyWith(color: textColorLight),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),

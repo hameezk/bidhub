@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../models/user_model.dart';
+import 'home_screen_customer.dart';
 import 'signup_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -76,7 +77,9 @@ class _LoginPageState extends State<LoginPage> {
         context,
         MaterialPageRoute(
           builder: (context) {
-            return const HomeScreenSeller();
+            return (userModel.role == 'Customer')
+                ? const HomeScreenCustomer()
+                : const HomeScreenSeller();
           },
         ),
       );

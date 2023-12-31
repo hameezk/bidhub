@@ -74,7 +74,7 @@ class AuctionModel {
     engineCapacity = map["engineCapacity"];
     bodytype = map["bodytype"];
     addedOn = map["addedOn"];
-    // features = map["features"];
+    features = map["features"];
     startDate = map["startDate"];
     bids = map["bids"];
     isActive = map["isActive"];
@@ -103,7 +103,7 @@ class AuctionModel {
       "engineCapacity": engineCapacity,
       "bodytype": bodytype,
       "addedOn": addedOn,
-      // "features": features,
+      "features": features,
       "bids": bids,
       "isActive": isActive,
       "winingBid": winingBid,
@@ -113,68 +113,68 @@ class AuctionModel {
   static List demoFeatures = [
     {
       'feature': 'ABS',
-      'icon': '',
-      'isavailable': true,
+      'icon': 'assets/abs.png',
+      'isavailable': false,
     },
     {
       'feature': 'AM/FM Radio',
-      'icon': '',
-      'isavailable': true,
+      'icon': 'assets/fm.png',
+      'isavailable': false,
     },
     {
       'feature': 'Air Bags',
-      'icon': '',
-      'isavailable': true,
+      'icon': 'assets/air-bag.png',
+      'isavailable': false,
     },
     {
       'feature': 'Air Conditioning',
-      'icon': '',
-      'isavailable': true,
+      'icon': 'assets/ac.png',
+      'isavailable': false,
     },
     {
       'feature': 'Alloy Rims',
-      'icon': '',
-      'isavailable': true,
+      'icon': 'assets/alloy.png',
+      'isavailable': false,
     },
     {
       'feature': 'CD Player',
-      'icon': '',
-      'isavailable': true,
+      'icon': 'assets/cd.png',
+      'isavailable': false,
     },
     {
       'feature': 'Cruise Control',
-      'icon': '',
-      'isavailable': true,
+      'icon': 'assets/cruise_controll.png',
+      'isavailable': false,
     },
     {
       'feature': 'Immobilizer Key',
-      'icon': '',
-      'isavailable': true,
+      'icon': 'assets/key.png',
+      'isavailable': false,
     },
     {
       'feature': 'Keyless Entry',
-      'icon': '',
-      'isavailable': true,
+      'icon': 'assets/security.png',
+      'isavailable': false,
     },
     {
       'feature': 'Power Locks',
-      'icon': '',
-      'isavailable': true,
+      'icon': 'assets/lock.png',
+      'isavailable': false,
     },
     {
       'feature': 'Power Mirrors',
-      'icon': '',
-      'isavailable': true,
+      'icon': 'assets/mirror.png',
+      'isavailable': false,
     },
     {
       'feature': 'Power Windows',
-      'icon': '',
-      'isavailable': true,
+      'icon': 'assets/window.png',
+      'isavailable': false,
     },
     {
       'feature': 'Sun Roof',
-      'icon': '',
-      'isavailable': true,
+      'icon': 'assets/sunroof.png',
+      'isavailable': false,
     },
   ];
   static List<AuctionModel> demoBids = [

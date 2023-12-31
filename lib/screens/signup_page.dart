@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
+import 'package:bidhub/config/loading_dialoge.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -62,11 +63,12 @@ class _SignupPageState extends State<SignupPage> {
 
   void signUp(String email, String password) async {
     UserCredential? credentials;
-
+    showLoadingDialog(context, 'Signing Up...');
     try {
       credentials = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
     } on FirebaseAuthException catch (ex) {
+      Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.blueGrey,
@@ -86,6 +88,7 @@ class _SignupPageState extends State<SignupPage> {
         recentBids: [],
         image: UserModel.defaultImage,
         phoneno: '',
+        savedBids: [],
       );
       await FirebaseFirestore.instance
           .collection("users")
@@ -93,6 +96,8 @@ class _SignupPageState extends State<SignupPage> {
           .set(newUser.toMap())
           .then(
         (value) {
+          Navigator.pop(context);
+          UserModel.loggedinUser = newUser;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               backgroundColor: Colors.blueGrey,

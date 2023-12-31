@@ -2,6 +2,8 @@
 
 import 'dart:io';
 
+import 'package:bidhub/config/loading_dialoge.dart';
+import 'package:bidhub/screens/home_screen_customer.dart';
 import 'package:bidhub/screens/home_screen_seller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -45,8 +47,6 @@ class _CompleteProfileState extends State<CompleteProfile> {
       });
     }
   }
-
-  
 
   void showImageOptions() {
     showDialog(
@@ -114,6 +114,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
   }
 
   void uploadData() async {
+    showLoadingDialog(context, 'Creating New user....');
     UploadTask uploadTask = FirebaseStorage.instance
         .ref("profilepictures")
         .child(widget.newUserModel.id.toString())
@@ -135,6 +136,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
         .set(widget.newUserModel.toMap())
         .then(
       (value) {
+        UserModel.loggedinUser = widget.newUserModel;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             backgroundColor: Colors.blueGrey,
@@ -147,7 +149,9 @@ class _CompleteProfileState extends State<CompleteProfile> {
           context,
           MaterialPageRoute(
             builder: (context) {
-              return const HomeScreenSeller();
+              return (widget.newUserModel.role == 'Customer')
+                  ? const HomeScreenCustomer()
+                  : const HomeScreenSeller();
             },
           ),
         );

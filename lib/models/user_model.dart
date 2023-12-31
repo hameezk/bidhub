@@ -5,6 +5,7 @@ class UserModel {
   String? phoneno;
   String? image;
   List? recentBids;
+  List? savedBids;
   String? role;
 
   UserModel({
@@ -15,6 +16,7 @@ class UserModel {
     required this.recentBids,
     required this.image,
     required this.role,
+    required this.savedBids,
   });
 
   UserModel.fromMap(Map<String, dynamic> map) {
@@ -25,6 +27,7 @@ class UserModel {
     image = map["image"];
     recentBids = map["recentBids"];
     role = map["role"];
+    savedBids = map["savedBids"];
   }
 
   Map<String, dynamic> toMap() {
@@ -36,6 +39,7 @@ class UserModel {
       "image": image,
       "recentBids": recentBids,
       "role": role,
+      "savedBids": savedBids,
 
     };
   }
