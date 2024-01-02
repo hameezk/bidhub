@@ -112,63 +112,64 @@ class _BiddingPageState extends State<BiddingPage> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: FutureBuilder(
-                      future: getOwnerModel(auctionModel),
-                      builder: (context, snap) {
-                        if (snap.connectionState == ConnectionState.done) {
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 20,
-                                    backgroundColor: textColorLight,
-                                    foregroundImage:
-                                        NetworkImage(ownerModel!.image ?? ''),
-                                    child: const CircularProgressIndicator(
-                                        color: textColorDark),
-                                  ),
-                                  Text(
-                                    '   ${ownerModel!.name}',
-                                    style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: textColorDark),
-                                  ),
-                                ],
-                              ),
-                              IconButton(
-                                onPressed: () async {
-                                  ChatroomModel? chatroomModel =
-                                      await getChatroomModel(ownerModel!);
-                                  if (chatroomModel != null) {
-                                    Navigator.pop(context);
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) {
-                                          return ChatRoom(
-                                            targetUser: ownerModel!,
-                                            chatRoom: chatroomModel,
-                                            userModel: UserModel.loggedinUser!,
-                                          );
-                                        },
-                                      ),
-                                    );
-                                  }
-                                },
-                                icon: const Icon(
-                                  Icons.chat_bubble_rounded,
-                                  color: textColorLight,
+                    future: getOwnerModel(auctionModel),
+                    builder: (context, snap) {
+                      if (snap.connectionState == ConnectionState.done) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: textColorLight,
+                                  foregroundImage:
+                                      NetworkImage(ownerModel!.image ?? ''),
+                                  child: const CircularProgressIndicator(
+                                      color: textColorDark),
                                 ),
+                                Text(
+                                  '   ${ownerModel!.name}',
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: textColorDark),
+                                ),
+                              ],
+                            ),
+                            IconButton(
+                              onPressed: () async {
+                                ChatroomModel? chatroomModel =
+                                    await getChatroomModel(ownerModel!);
+                                if (chatroomModel != null) {
+                                  Navigator.pop(context);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) {
+                                        return ChatRoom(
+                                          targetUser: ownerModel!,
+                                          chatRoom: chatroomModel,
+                                          userModel: UserModel.loggedinUser!,
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.chat_bubble_rounded,
+                                color: textColorLight,
                               ),
-                            ],
-                          );
-                        }
-                        return Container(
-                          height: 0,
+                            ),
+                          ],
                         );
-                      }),
+                      }
+                      return Container(
+                        height: 0,
+                      );
+                    },
+                  ),
                 ),
                 const Padding(
                   padding: EdgeInsets.all(8.0),
@@ -244,10 +245,31 @@ class _BiddingPageState extends State<BiddingPage> {
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
                           color: textColorLight.withOpacity(0.75)),
-                      child: Center(
-                        child: Countdown(
-                            endDate: DateTime.parse(
-                                widget.auctionModel.endDate ?? "")),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              (auctionModel.winingBid == '')
+                                  ? auctionModel.startingBid ?? ''
+                                  : auctionModel.winingBid ?? '',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall!
+                                  .copyWith(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: secondaryColor),
+                            ),
+                            Text('Current Bid',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(color: textColorDark)),
+                          ],
+                        ),
                       ),
                     ),
                   ],
