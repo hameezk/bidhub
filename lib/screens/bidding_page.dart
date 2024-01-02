@@ -247,27 +247,36 @@ class _BiddingPageState extends State<BiddingPage> {
                           color: textColorLight.withOpacity(0.75)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text(
-                              (auctionModel.winingBid == '')
-                                  ? auctionModel.startingBid ?? ''
-                                  : auctionModel.winingBid ?? '',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall!
-                                  .copyWith(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: secondaryColor),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  (auctionModel.winingBid == '')
+                                      ? auctionModel.startingBid ?? ''
+                                      : auctionModel.winingBid ?? '',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineSmall!
+                                      .copyWith(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green),
+                                ),
+                                Text('Current Bid',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(color: textColorDark)),
+                              ],
                             ),
-                            Text('Current Bid',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge!
-                                    .copyWith(color: textColorDark)),
+                            const Icon(
+                              Icons.arrow_circle_right_outlined,
+                              color: textColorDark,
+                            )
                           ],
                         ),
                       ),
