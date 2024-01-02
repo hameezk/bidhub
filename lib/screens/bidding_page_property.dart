@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:bidhub/config/countdown.dart';
 import 'package:bidhub/config/navigate.dart';
 import 'package:bidhub/helpers/firebase_helper.dart';
 import 'package:bidhub/models/auction_model.dart';
@@ -15,15 +14,15 @@ import '../config/size.dart';
 import '../models/chatroom_model.dart';
 import 'chat_page.dart';
 
-class BiddingPage extends StatefulWidget {
+class BiddingPageProperty extends StatefulWidget {
   final AuctionModel auctionModel;
-  const BiddingPage({super.key, required this.auctionModel});
+  const BiddingPageProperty({super.key, required this.auctionModel});
 
   @override
-  State<BiddingPage> createState() => _BiddingPageState();
+  State<BiddingPageProperty> createState() => _BiddingPagePropertyState();
 }
 
-class _BiddingPageState extends State<BiddingPage> {
+class _BiddingPagePropertyState extends State<BiddingPageProperty> {
   TextEditingController bidController = TextEditingController();
   UserModel? ownerModel;
 
@@ -222,35 +221,6 @@ class _BiddingPageState extends State<BiddingPage> {
                       ],
                     ),
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      height: height(context) * 0.15,
-                      width: width(context) * 0.4,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: textColorLight.withOpacity(0.75)),
-                      child: Center(
-                        child: Countdown(
-                            endDate: DateTime.parse(
-                                widget.auctionModel.endDate ?? "")),
-                      ),
-                    ),
-                    Container(
-                      height: height(context) * 0.15,
-                      width: width(context) * 0.4,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: textColorLight.withOpacity(0.75)),
-                      child: Center(
-                        child: Countdown(
-                            endDate: DateTime.parse(
-                                widget.auctionModel.endDate ?? "")),
-                      ),
-                    ),
-                  ],
                 ),
                 Text(
                   'Current Bid: ${auctionModel.startingBid}',

@@ -220,8 +220,8 @@ class _UserProfileCustomerState extends State<UserProfileCustomer> {
               //                       dataSnapshot.docs[index].data()
               //                           as Map<String, dynamic>;
 
-              //                   AuctionModel auctionModel =
-              //                       AuctionModel.fromMap(auctionMap);
+              //                   auctionModel auctionModel =
+              //                       auctionModel.fromMap(auctionMap);
               //                   if (auctionModel.carName!
               //                       .toLowerCase()
               //                       .contains('')) {

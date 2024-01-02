@@ -7,7 +7,6 @@ import 'package:bidhub/screens/home_screen_seller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../screens/user_profile_customer.dart';
-import '../screens/user_profile_seller.dart';
 import 'colors.dart';
 import 'navigate.dart';
 
@@ -69,7 +68,7 @@ Container sellerBottombar(BuildContext context, int pageIndex) {
                 }
               },
               icon: const Icon(
-                Icons.car_repair,
+                Icons.add_business_outlined,
                 color: textColorDark,
                 size: 28,
               ),

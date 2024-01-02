@@ -4,11 +4,14 @@ import 'package:bidhub/config/size.dart';
 import 'package:bidhub/models/auction_model.dart';
 import 'package:bidhub/models/user_model.dart';
 import 'package:bidhub/screens/auction_details.dart';
+import 'package:bidhub/screens/property_details.dart';
+import 'package:bidhub/screens/user_profile_customer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../config/bottombar.dart';
+import '../models/property_model.dart';
 
 class HomeScreenCustomer extends StatefulWidget {
   const HomeScreenCustomer({super.key});
@@ -20,6 +23,7 @@ class HomeScreenCustomer extends StatefulWidget {
 class _HomeScreenCustomerState extends State<HomeScreenCustomer> {
   TextEditingController searchController = TextEditingController();
   String searchKey = '';
+  bool isCars = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,7 +76,9 @@ class _HomeScreenCustomerState extends State<HomeScreenCustomer> {
                                       ),
                                       GestureDetector(
                                         onTap: () {
-                                          // AuctionModel.uploadDemoData(context);
+                                          // auctionModel.uploadDemoData(context);
+                                          navigate(context,
+                                              const UserProfileCustomer());
                                         },
                                         child: SizedBox(
                                           height: height(context) * 0.1,
@@ -132,13 +138,21 @@ class _HomeScreenCustomerState extends State<HomeScreenCustomer> {
                                       .bodyMedium!
                                       .copyWith(color: textColorLight),
                                   decoration: InputDecoration(
-                                    hintText: 'Search Cars...',
+                                    hintText:
+                                        'Search ${(isCars) ? 'Cars' : 'Properties'}...',
                                     hintStyle: Theme.of(context)
                                         .textTheme
                                         .bodyMedium!
                                         .copyWith(color: textColorDark),
                                     border: InputBorder.none,
                                   ),
+                                  onChanged: (v) {
+                                    setState(() {
+                                      searchKey = searchController.text
+                                          .toLowerCase()
+                                          .trim();
+                                    });
+                                  },
                                 ),
                               ),
                             ),
@@ -155,13 +169,13 @@ class _HomeScreenCustomerState extends State<HomeScreenCustomer> {
                                 child: IconButton(
                                   onPressed: () {
                                     setState(() {
-                                      searchKey = searchController.text
-                                          .toLowerCase()
-                                          .trim();
+                                      isCars = !isCars;
                                     });
                                   },
-                                  icon: const Icon(
-                                    Icons.search,
+                                  icon: Icon(
+                                    (!isCars)
+                                        ? CupertinoIcons.car_detailed
+                                        : CupertinoIcons.house_alt_fill,
                                     color: textColorDark,
                                     size: 28,
                                   ),
@@ -172,71 +186,7 @@ class _HomeScreenCustomerState extends State<HomeScreenCustomer> {
                         ],
                       ),
                     ),
-                    Expanded(
-                      child: StreamBuilder(
-                        stream: FirebaseFirestore.instance
-                            .collection("auction")
-                            .where("isActive", isEqualTo: true)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.active) {
-                            if (snapshot.hasData) {
-                              QuerySnapshot dataSnapshot =
-                                  snapshot.data as QuerySnapshot;
-                              if (dataSnapshot.docs.isNotEmpty) {
-                                return ListView.builder(
-                                    padding: EdgeInsets.zero,
-                                    itemCount: dataSnapshot.docs.length,
-                                    itemBuilder: (context, index) {
-                                      Map<String, dynamic> auctionMap =
-                                          dataSnapshot.docs[index].data()
-                                              as Map<String, dynamic>;
-
-                                      AuctionModel auctionModel =
-                                          AuctionModel.fromMap(auctionMap);
-                                      if (auctionModel.carName!
-                                          .toLowerCase()
-                                          .contains(searchKey)) {
-                                        return buildAuctionCard(
-                                          auctionModel,
-                                          (index ==
-                                              dataSnapshot.docs.length - 1),
-                                        );
-                                      } else {
-                                        return Container();
-                                      }
-                                    });
-                              } else {
-                                return const Text(
-                                  "No results found!",
-                                  style: TextStyle(
-                                    color: Colors.blueGrey,
-                                  ),
-                                );
-                              }
-                            } else if (snapshot.hasError) {
-                              return const Text(
-                                "An error occoured!",
-                                style: TextStyle(
-                                  color: Colors.blueGrey,
-                                ),
-                              );
-                            } else {
-                              return const Text(
-                                "No results found!",
-                                style: TextStyle(
-                                  color: Colors.blueGrey,
-                                ),
-                              );
-                            }
-                          } else {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          }
-                        },
-                      ),
-                    ),
+                    (isCars) ? buildCarList() : buildPropertyList(),
                   ],
                 ),
               ),
@@ -244,6 +194,72 @@ class _HomeScreenCustomerState extends State<HomeScreenCustomer> {
           ),
           buildNavBar(context, 0),
         ],
+      ),
+    );
+  }
+
+  buildPropertyList() {
+    // PropertyModel.uploadDemoData(context);
+    return Expanded(
+      child: StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection("properties")
+            .where("isActive", isEqualTo: true)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.active) {
+            if (snapshot.hasData) {
+              QuerySnapshot dataSnapshot = snapshot.data as QuerySnapshot;
+
+              if (dataSnapshot.docs.isNotEmpty) {
+                return ListView.builder(
+                    padding: EdgeInsets.zero,
+                    itemCount: dataSnapshot.docs.length,
+                    itemBuilder: (context, index) {
+                      Map<String, dynamic> propertiesMap =
+                          dataSnapshot.docs[index].data()
+                              as Map<String, dynamic>;
+
+                      PropertyModel propertyModel =
+                          PropertyModel.fromMap(propertiesMap);
+                      if (propertyModel.location!
+                          .toLowerCase()
+                          .contains(searchKey)) {
+                        return buildPropertyCard(
+                          propertyModel,
+                          (index == dataSnapshot.docs.length - 1),
+                        );
+                      } else {
+                        return Container();
+                      }
+                    });
+              } else {
+                return const Text(
+                  "No results found!",
+                  style: TextStyle(
+                    color: Colors.blueGrey,
+                  ),
+                );
+              }
+            } else if (snapshot.hasError) {
+              return const Text(
+                "An error occoured!",
+                style: TextStyle(
+                  color: Colors.blueGrey,
+                ),
+              );
+            } else {
+              return const Text(
+                "No results found!",
+                style: TextStyle(
+                  color: Colors.blueGrey,
+                ),
+              );
+            }
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
       ),
     );
   }
@@ -347,6 +363,173 @@ class _HomeScreenCustomerState extends State<HomeScreenCustomer> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  buildPropertyCard(PropertyModel propertyModel, bool isLast) {
+    return GestureDetector(
+      onTap: () {
+        navigate(context, PropertyDetails(propertyModel: propertyModel));
+      },
+      child: Padding(
+        padding: EdgeInsets.only(bottom: (isLast) ? 150.0 : 0),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            height: 200,
+            width: width(context) * 0.9,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: containerColor.withOpacity(0.3),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: Image.network(
+                          propertyModel.images![0],
+                          fit: BoxFit.cover,
+                          height: 130,
+                          width: width(context) * 0.4,
+                        ),
+                      ),
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: width(context) * 0.4,
+                          child: Text(
+                            propertyModel.location ?? "",
+                            maxLines: 2,
+                            style: Theme.of(context)
+                                .textTheme
+                                .displaySmall!
+                                .copyWith(color: textColorLight),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 24.0),
+                              child: Text(
+                                propertyModel.type ?? "",
+                                maxLines: 1,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .displaySmall!
+                                    .copyWith(color: textColorLight),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 18.0),
+                            child: Icon(
+                              Icons.timer,
+                              color: textColorLight,
+                            ),
+                          ),
+                          Text(
+                            DateFormat('EEEE, MMM d, yyyy HH:mm').format(
+                                DateTime.parse(propertyModel.startDate ?? '')),
+                            maxLines: 1,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge!
+                                .copyWith(color: textColorLight),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  buildCarList() {
+    return Expanded(
+      child: StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection("auction")
+            .where("isActive", isEqualTo: true)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.active) {
+            if (snapshot.hasData) {
+              QuerySnapshot dataSnapshot = snapshot.data as QuerySnapshot;
+
+              if (dataSnapshot.docs.isNotEmpty) {
+                return ListView.builder(
+                    padding: EdgeInsets.zero,
+                    itemCount: dataSnapshot.docs.length,
+                    itemBuilder: (context, index) {
+                      Map<String, dynamic> auctionMap = dataSnapshot.docs[index]
+                          .data() as Map<String, dynamic>;
+
+                      AuctionModel auctionModel =
+                          AuctionModel.fromMap(auctionMap);
+                      if (auctionModel.carName!
+                          .toLowerCase()
+                          .contains(searchKey)) {
+                        return buildAuctionCard(
+                          auctionModel,
+                          (index == dataSnapshot.docs.length - 1),
+                        );
+                      } else {
+                        return Container();
+                      }
+                    });
+              } else {
+                return const Text(
+                  "No results found!",
+                  style: TextStyle(
+                    color: Colors.blueGrey,
+                  ),
+                );
+              }
+            } else if (snapshot.hasError) {
+              return const Text(
+                "An error occoured!",
+                style: TextStyle(
+                  color: Colors.blueGrey,
+                ),
+              );
+            } else {
+              return const Text(
+                "No results found!",
+                style: TextStyle(
+                  color: Colors.blueGrey,
+                ),
+              );
+            }
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
       ),
     );
   }

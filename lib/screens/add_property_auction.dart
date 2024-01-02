@@ -4,9 +4,8 @@ import 'package:bidhub/config/loading_dialoge.dart';
 import 'package:bidhub/config/size.dart';
 import 'package:bidhub/config/snackbar.dart';
 import 'package:bidhub/config/theme.dart';
-import 'package:bidhub/models/auction_model.dart';
 import 'package:bidhub/models/user_model.dart';
-import 'package:bidhub/screens/add_property_auction.dart';
+import 'package:bidhub/screens/add_car_auction.dart';
 import 'package:bidhub/screens/home_screen_seller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -18,34 +17,27 @@ import 'package:page_transition/page_transition.dart';
 import 'package:uuid/uuid.dart';
 
 import '../config/colors.dart';
+import '../models/property_model.dart';
 
-class AddAuction extends StatefulWidget {
-  const AddAuction({super.key});
+class AddAuctionProperty extends StatefulWidget {
+  const AddAuctionProperty({super.key});
 
   @override
-  State<AddAuction> createState() => _AddAuctionState();
+  State<AddAuctionProperty> createState() => _AddAuctionPropertyState();
 }
 
-class _AddAuctionState extends State<AddAuction> {
+class _AddAuctionPropertyState extends State<AddAuctionProperty> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController makeController = TextEditingController();
-  final TextEditingController modelController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
-  final TextEditingController locationController = TextEditingController();
-  final TextEditingController milageController = TextEditingController();
-  final TextEditingController enginetypeController = TextEditingController();
-  final TextEditingController transmissionTypeController =
-      TextEditingController();
-  final TextEditingController regsteredInController = TextEditingController();
-  final TextEditingController colorController = TextEditingController();
-  final TextEditingController engineCapacityController =
-      TextEditingController();
-  final TextEditingController bodytypeController = TextEditingController();
-  final TextEditingController categoryController = TextEditingController();
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController startingBidController = TextEditingController();
-  final TextEditingController startingDateController = TextEditingController();
-  final TextEditingController endDateController = TextEditingController();
+  TextEditingController areaController = TextEditingController();
+  TextEditingController typeController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+  TextEditingController locationController = TextEditingController();
+  TextEditingController bedroomController = TextEditingController();
+  TextEditingController bathsController = TextEditingController();
+  TextEditingController startingBidController = TextEditingController();
+  TextEditingController startingDateController = TextEditingController();
+  TextEditingController endDateController = TextEditingController();
+  TextEditingController noneController = TextEditingController();
   List<File> images = [];
   List<String> imageLinks = [];
   DateTime? biddingDate;
@@ -56,68 +48,48 @@ class _AddAuctionState extends State<AddAuction> {
   Uuid uuid = const Uuid();
   List features = [
     {
-      'feature': 'ABS',
-      'icon': 'assets/abs.png',
+      'feature': 'Built in year',
+      'icon': 'assets/calendar.png',
       'isavailable': false,
     },
     {
-      'feature': 'AM/FM Radio',
-      'icon': 'assets/fm.png',
+      'feature': 'Parking Spaces',
+      'icon': 'assets/parking.png',
       'isavailable': false,
     },
     {
-      'feature': 'Air Bags',
-      'icon': 'assets/air-bag.png',
+      'feature': 'Double Glazed Windows',
+      'icon': 'assets/windowss.png',
       'isavailable': false,
     },
     {
-      'feature': 'Air Conditioning',
+      'feature': 'Centeral Air Conditioning',
       'icon': 'assets/ac.png',
       'isavailable': false,
     },
     {
-      'feature': 'Alloy Rims',
-      'icon': 'assets/alloy.png',
+      'feature': 'Central Heating',
+      'icon': 'assets/heater.png',
       'isavailable': false,
     },
     {
-      'feature': 'CD Player',
-      'icon': 'assets/cd.png',
+      'feature': 'Flooring',
+      'icon': 'assets/floor.png',
       'isavailable': false,
     },
     {
-      'feature': 'Cruise Control',
-      'icon': 'assets/cruise_controll.png',
+      'feature': 'Waste Disposal',
+      'icon': 'assets/trash.png',
       'isavailable': false,
     },
     {
-      'feature': 'Immobilizer Key',
-      'icon': 'assets/key.png',
+      'feature': 'Drawing Room',
+      'icon': 'assets/sofa.png',
       'isavailable': false,
     },
     {
-      'feature': 'Keyless Entry',
-      'icon': 'assets/security.png',
-      'isavailable': false,
-    },
-    {
-      'feature': 'Power Locks',
-      'icon': 'assets/lock.png',
-      'isavailable': false,
-    },
-    {
-      'feature': 'Power Mirrors',
-      'icon': 'assets/mirror.png',
-      'isavailable': false,
-    },
-    {
-      'feature': 'Power Windows',
-      'icon': 'assets/window.png',
-      'isavailable': false,
-    },
-    {
-      'feature': 'Sun Roof',
-      'icon': 'assets/sunroof.png',
+      'feature': 'Dining Room',
+      'icon': 'assets/dining.png',
       'isavailable': false,
     },
   ];
@@ -162,25 +134,8 @@ class _AddAuctionState extends State<AddAuction> {
                               borderRadius: BorderRadius.circular(15),
                               color: textColorLight),
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Container(
-                                width: width(context) * 0.45,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(15),
-                                    color: containerColor),
-                                child: const Center(
-                                  child: FittedBox(
-                                    child: Text(
-                                      'Add Car',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: textColorLight,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
                               GestureDetector(
                                 onTap: () {
                                   Navigator.pushReplacement(
@@ -193,7 +148,7 @@ class _AddAuctionState extends State<AddAuction> {
                                       reverseDuration:
                                           const Duration(milliseconds: 600),
                                       type: PageTransitionType.fade,
-                                      child: const AddAuctionProperty(),
+                                      child: const AddAuction(),
                                     ),
                                   );
                                 },
@@ -202,12 +157,30 @@ class _AddAuctionState extends State<AddAuction> {
                                   child: const Center(
                                     child: FittedBox(
                                       child: Text(
-                                        'Add Property',
+                                        'Add Car',
                                         style: TextStyle(
                                           fontSize: 16,
                                           color: textColorDark,
                                           fontWeight: FontWeight.bold,
                                         ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: width(context) * 0.45,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    color: containerColor),
+                                child: const Center(
+                                  child: FittedBox(
+                                    child: Text(
+                                      'Add Property',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: textColorLight,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
@@ -296,43 +269,26 @@ class _AddAuctionState extends State<AddAuction> {
                           },
                         ),
                       ),
-                      buildTextFormFeild(nameController, 'Car Name',
-                          'Please enter the car name'),
                       buildTextFormFeild(
                           descriptionController,
-                          'Car description',
-                          'Please enter the car description'),
-                      buildTextFormFeild(categoryController, 'Car category',
-                          'Please enter the car category'),
-                      buildTextFormFeild(makeController, 'Car make',
-                          'Please enter the car make'),
-                      buildTextFormFeild(modelController, 'Car Model',
-                          'Please enter the car model'),
-                      buildTextFormFeild(milageController, 'Car Milage',
-                          'Please enter the car milage'),
-                      buildTextFormFeild(enginetypeController, 'Engine Type',
-                          'Please enter the engine type'),
+                          'Property Description',
+                          'Please enter the Property description'),
+                      buildTextFormFeild(areaController, 'Property Area',
+                          'Please enter the Property area'),
+                      buildTextFormFeild(typeController, 'Property Type',
+                          'Please enter the Property Type'),
+                      buildTextFormFeild(bedroomController, 'No. of Bedrooms',
+                          'Please enter the number of bedrooms'),
+                      buildTextFormFeild(bathsController, 'No. of Baths',
+                          'Please enter the number of baths'),
                       buildTextFormFeild(
-                          transmissionTypeController,
-                          'Transmission Type',
-                          'Please enter the Transmission Type'),
-                      buildTextFormFeild(regsteredInController, 'Registration',
-                          'Please enter the registration'),
-                      buildTextFormFeild(colorController, 'Car Color',
-                          'Please enter the car color'),
-                      buildTextFormFeild(
-                          engineCapacityController,
-                          'Engine Capacity',
-                          'Please enter the Engine Capacity'),
-                      buildTextFormFeild(bodytypeController, 'Body Type',
-                          'Please enter the body type'),
-                      buildTextFormFeild(locationController, 'Car location',
-                          'Please enter the car location'),
+                          locationController,
+                          'Property location',
+                          'Please enter the Property location'),
                       buildTextFormFeild(startingBidController, 'Starting Bid',
                           'Please enter the car starting bid'),
-                      const SizedBox(height: 50.0),
+                      const SizedBox(height: 0.0),
                       GridView.builder(
-                        padding: EdgeInsets.zero,
                         primary: false,
                         shrinkWrap: true,
                         gridDelegate:
@@ -638,37 +594,30 @@ class _AddAuctionState extends State<AddAuction> {
       imageLinks.add(imageUrl);
     }
 
-    AuctionModel auctionModel = AuctionModel(
+    PropertyModel propertyModel = PropertyModel(
       id: uuid.v1(),
-      category: categoryController.text.trim(),
-      carName: nameController.text.trim(),
       images: imageLinks,
       description: descriptionController.text.trim(),
       ownerId: UserModel.loggedinUser!.id,
-      carMake: makeController.text.trim(),
       startDate: startTime.toString(),
       endDate: endTime.toString(),
       location: locationController.text.trim(),
       startingBid: startingBidController.text.trim(),
-      model: modelController.text.trim(),
-      milage: milageController.text.trim(),
-      enginetype: enginetypeController.text.trim(),
-      transmissionType: transmissionTypeController.text.trim(),
-      regsteredIn: regsteredInController.text.trim(),
-      color: colorController.text.trim(),
-      engineCapacity: engineCapacityController.text.trim(),
-      bodytype: bodytypeController.text.trim(),
       addedOn: DateTime.now().toString(),
       features: features,
       bids: [],
       isActive: true,
       winingBid: '',
+      area: '',
+      baths: '',
+      bedrooms: '',
+      type: '',
     );
 
     await FirebaseFirestore.instance
         .collection("auction")
-        .doc(auctionModel.id)
-        .set(auctionModel.toMap())
+        .doc(propertyModel.id)
+        .set(propertyModel.toMap())
         .then(
       (value) {
         ScaffoldMessenger.of(context).showSnackBar(
