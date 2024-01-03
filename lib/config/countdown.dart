@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 
 class Countdown extends StatefulWidget {
   final DateTime endDate;
-  const Countdown({super.key, required this.endDate});
+  const Countdown(
+      {super.key, required this.endDate});
 
   @override
   CountdownState createState() => CountdownState();
@@ -34,32 +35,44 @@ class CountdownState extends State<Countdown> {
     return StreamBuilder<int>(
       stream: _timerStream(endTime),
       builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-        if (snapshot.hasData) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  _formatTime(snapshot.data ?? 0),
-                  style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: secondaryColor),
-                ),
-                Text('Time left...',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyLarge!
-                        .copyWith(color: textColorDark)),
-              ],
-            ),
+        if (snapshot.connectionState == ConnectionState.done) {
+        
+          return Text(
+            '00:00:00',
+            style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: secondaryColor),
           );
         } else {
-          return const CircularProgressIndicator();
+          if (snapshot.hasData) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _formatTime(snapshot.data ?? 0),
+                    style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: secondaryColor),
+                  ),
+                  Text('Time left...',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(color: textColorDark)),
+                ],
+              ),
+            );
+          } else {
+            return const CircularProgressIndicator();
+          }
         }
       },
     );
   }
+
 }
