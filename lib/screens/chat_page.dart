@@ -251,6 +251,7 @@ class ChatRoomState extends State<ChatRoom> {
                                       ),
                                     ],
                                   ),
+                                  // subtitle: (),
                                   trailing: const CircleAvatar(
                                     backgroundColor: Colors.transparent,
                                   ),

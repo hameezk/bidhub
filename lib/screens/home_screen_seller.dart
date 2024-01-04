@@ -505,7 +505,7 @@ class _HomeScreenState extends State<HomeScreenSeller> {
                     });
               } else {
                 return const Text(
-                  "No results found!",
+                  "No results found!c12",
                   style: TextStyle(
                     color: Colors.blueGrey,
                   ),
@@ -520,7 +520,7 @@ class _HomeScreenState extends State<HomeScreenSeller> {
               );
             } else {
               return const Text(
-                "No results found!",
+                "No results found!c2",
                 style: TextStyle(
                   color: Colors.blueGrey,
                 ),

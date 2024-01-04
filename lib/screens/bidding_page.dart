@@ -7,6 +7,7 @@ import 'package:bidhub/helpers/firebase_helper.dart';
 import 'package:bidhub/models/auction_model.dart';
 import 'package:bidhub/models/user_model.dart';
 import 'package:bidhub/screens/auction_details.dart';
+import 'package:bidhub/screens/bids_show.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
@@ -15,6 +16,7 @@ import '../config/colors.dart';
 import '../config/get_chatroom.dart';
 import '../config/size.dart';
 import '../models/chatroom_model.dart';
+import '../models/message_model.dart';
 import 'chat_page.dart';
 
 class BiddingPage extends StatefulWidget {
@@ -244,51 +246,70 @@ class _BiddingPageState extends State<BiddingPage> {
                         borderRadius: BorderRadius.circular(20),
                         color: textColorLight.withOpacity(0.75)),
                     child: Center(
-                      child: Countdown(
-                        endDate:
-                            DateTime.parse(widget.auctionModel.endDate ?? ""),
-                      ),
+                      child: (DateTime.parse(auctionModel.endDate ?? '')
+                              .isAfter(DateTime.now()))
+                          ? Countdown(
+                              endDate: DateTime.parse(
+                                  widget.auctionModel.endDate ?? ""),
+                              auctionModel: auctionModel,
+                            )
+                          : Text(
+                              '00:00:00',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall!
+                                  .copyWith(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: secondaryColor),
+                            ),
                     ),
                   ),
-                  Container(
-                    height: height(context) * 0.15,
-                    width: width(context) * 0.4,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: textColorLight.withOpacity(0.75)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                (auctionModel.winingBid == '')
-                                    ? auctionModel.startingBid ?? ''
-                                    : auctionModel.winingBid ?? '',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineSmall!
-                                    .copyWith(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.green),
-                              ),
-                              Text('Current Bid',
+                  GestureDetector(
+                    onTap: () {
+                      navigate(
+                          context, ShowAllCarBids(auctionModel: auctionModel));
+                    },
+                    child: Container(
+                      height: height(context) * 0.15,
+                      width: width(context) * 0.4,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: textColorLight.withOpacity(0.75)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  (auctionModel.winingBid == '')
+                                      ? auctionModel.startingBid ?? ''
+                                      : auctionModel.winingBid ?? '',
                                   style: Theme.of(context)
                                       .textTheme
-                                      .bodyLarge!
-                                      .copyWith(color: textColorDark)),
-                            ],
-                          ),
-                          const Icon(
-                            Icons.arrow_circle_right_outlined,
-                            color: textColorDark,
-                          )
-                        ],
+                                      .headlineSmall!
+                                      .copyWith(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green),
+                                ),
+                                Text('Current Bid',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(color: textColorDark)),
+                              ],
+                            ),
+                            const Icon(
+                              Icons.arrow_circle_right_outlined,
+                              color: textColorDark,
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -377,8 +398,8 @@ class _BiddingPageState extends State<BiddingPage> {
     updatedAuctionModel.winingBid = currentBid['bidValue'];
     await FirebaseFirestore.instance
         .collection("auction")
-        .doc(auctionModel.id)
-        .set(auctionModel.toMap())
+        .doc(updatedAuctionModel.id)
+        .set(updatedAuctionModel.toMap())
         .then(
       (value) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -407,7 +428,6 @@ class _BiddingPageState extends State<BiddingPage> {
 
   endAuction(BuildContext context, AuctionModel auctionModel) async {
     auctionModel.isActive = false;
-    
     await FirebaseFirestore.instance
         .collection("auction")
         .doc(auctionModel.id)
@@ -421,7 +441,38 @@ class _BiddingPageState extends State<BiddingPage> {
             content: Text("Auction closed"),
           ),
         );
+        Map winningBid = auctionModel.bids!.last;
+        sendMessage(winningBid, auctionModel.id ?? '');
       },
     );
+  }
+
+  Future<void> sendMessage(Map winningBid, String auctionModelId) async {
+    UserModel? winnerUserodel =
+        await FirebaseHelper.getUserModelById(winningBid['bidderId']);
+    ChatroomModel? chatroomModel = await getChatroomModelAdmin(winnerUserodel!);
+    if (chatroomModel != null) {
+      MessageModel newMessage = MessageModel(
+        messageId: uuid.v1(),
+        sender: 'tBuAzA90NffCXIyfMiKR0Nw3RHc2',
+        createdon: DateTime.now().toString(),
+        text: 'Congragulations on winning the bid',
+        seen: false,
+        auctionLink: auctionModelId,
+      );
+
+      FirebaseFirestore.instance
+          .collection("chatrooms")
+          .doc(chatroomModel.chatroomId)
+          .collection("messages")
+          .doc(newMessage.messageId)
+          .set(newMessage.toMap());
+
+      chatroomModel.lastMessage = 'Congragulations on winning the bid';
+      FirebaseFirestore.instance
+          .collection("chatrooms")
+          .doc(chatroomModel.chatroomId)
+          .set(chatroomModel.toMap());
+    }
   }
 }

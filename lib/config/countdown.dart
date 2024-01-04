@@ -1,18 +1,34 @@
 import 'package:bidhub/config/colors.dart';
+import 'package:bidhub/config/get_chatroom.dart';
+import 'package:bidhub/models/chatroom_model.dart';
+import 'package:bidhub/models/property_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
+
+import '../helpers/firebase_helper.dart';
+import '../models/auction_model.dart';
+import '../models/message_model.dart';
+import '../models/user_model.dart';
 
 class Countdown extends StatefulWidget {
+  final AuctionModel? auctionModel;
+  final PropertyModel? propertyModel;
   final DateTime endDate;
   const Countdown(
-      {super.key, required this.endDate});
+      {super.key,
+      required this.endDate,
+      this.auctionModel,
+      this.propertyModel});
 
   @override
   CountdownState createState() => CountdownState();
 }
 
 class CountdownState extends State<Countdown> {
+  Uuid uuid = const Uuid();
   Stream<int> _timerStream(DateTime endTime) async* {
-    while (true) {
+    while (endTime.isAfter(DateTime.now())) {
       yield endTime.difference(DateTime.now()).inSeconds;
       await Future.delayed(const Duration(seconds: 1));
     }
@@ -24,6 +40,10 @@ class CountdownState extends State<Countdown> {
     int hours = (totalSeconds % 86400) ~/ 3600;
     int minutes = (totalSeconds % 3600) ~/ 60;
     int seconds = totalSeconds % 60;
+    if ('${twoDigits(hours)}:${twoDigits(minutes)}:${twoDigits(seconds)}' ==
+        '00:00:00') {
+      endAuctionCar(context, widget.auctionModel!);
+    }
     return (days > 0)
         ? '$days:${twoDigits(hours)}:${twoDigits(minutes)}:${twoDigits(seconds)}'
         : '${twoDigits(hours)}:${twoDigits(minutes)}:${twoDigits(seconds)}';
@@ -36,7 +56,6 @@ class CountdownState extends State<Countdown> {
       stream: _timerStream(endTime),
       builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-        
           return Text(
             '00:00:00',
             style: Theme.of(context).textTheme.headlineSmall!.copyWith(
@@ -75,4 +94,53 @@ class CountdownState extends State<Countdown> {
     );
   }
 
+  endAuctionCar(BuildContext context, AuctionModel auctionModel) async {
+    auctionModel.isActive = false;
+    await FirebaseFirestore.instance
+        .collection("auction")
+        .doc(auctionModel.id)
+        .set(auctionModel.toMap())
+        .then(
+      (value) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.blueGrey,
+            duration: Duration(seconds: 1),
+            content: Text("Auction closed"),
+          ),
+        );
+        Map winningBid = auctionModel.bids!.last;
+        sendMessageCar(winningBid, auctionModel.id ?? '');
+      },
+    );
+  }
+
+  Future<void> sendMessageCar(Map winningBid, String auctionModelId) async {
+    UserModel? winnerUserodel =
+        await FirebaseHelper.getUserModelById(winningBid['bidderId']);
+    ChatroomModel? chatroomModel = await getChatroomModelAdmin(winnerUserodel!);
+    if (chatroomModel != null) {
+      MessageModel newMessage = MessageModel(
+        messageId: uuid.v1(),
+        sender: 'tBuAzA90NffCXIyfMiKR0Nw3RHc2',
+        createdon: DateTime.now().toString(),
+        text: 'Congragulations on winning the bid',
+        seen: false,
+        auctionLink: auctionModelId,
+      );
+
+      FirebaseFirestore.instance
+          .collection("chatrooms")
+          .doc(chatroomModel.chatroomId)
+          .collection("messages")
+          .doc(newMessage.messageId)
+          .set(newMessage.toMap());
+
+      chatroomModel.lastMessage = 'Congragulations on winning the bid';
+      FirebaseFirestore.instance
+          .collection("chatrooms")
+          .doc(chatroomModel.chatroomId)
+          .set(chatroomModel.toMap());
+    }
+  }
 }

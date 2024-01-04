@@ -235,9 +235,9 @@ class _HomeScreenCustomerState extends State<HomeScreenCustomer> {
                     });
               } else {
                 return const Text(
-                  "No results found!",
+                  "No results found!1",
                   style: TextStyle(
-                    color: Colors.blueGrey,
+                    color: Colors.red,
                   ),
                 );
               }
@@ -250,9 +250,9 @@ class _HomeScreenCustomerState extends State<HomeScreenCustomer> {
               );
             } else {
               return const Text(
-                "No results found!",
+                "No results found!2",
                 style: TextStyle(
-                  color: Colors.blueGrey,
+                  color: Colors.blue,
                 ),
               );
             }
@@ -481,7 +481,6 @@ class _HomeScreenCustomerState extends State<HomeScreenCustomer> {
           if (snapshot.connectionState == ConnectionState.active) {
             if (snapshot.hasData) {
               QuerySnapshot dataSnapshot = snapshot.data as QuerySnapshot;
-
               if (dataSnapshot.docs.isNotEmpty) {
                 return ListView.builder(
                     padding: EdgeInsets.zero,
@@ -505,9 +504,9 @@ class _HomeScreenCustomerState extends State<HomeScreenCustomer> {
                     });
               } else {
                 return const Text(
-                  "No results found!",
+                  "No results found!3",
                   style: TextStyle(
-                    color: Colors.blueGrey,
+                    color: Colors.white,
                   ),
                 );
               }
@@ -520,9 +519,9 @@ class _HomeScreenCustomerState extends State<HomeScreenCustomer> {
               );
             } else {
               return const Text(
-                "No results found!",
+                "No results found!4",
                 style: TextStyle(
-                  color: Colors.blueGrey,
+                  color: Colors.amber,
                 ),
               );
             }

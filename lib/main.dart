@@ -1,5 +1,5 @@
-
 import 'package:bidhub/helpers/firebase_helper.dart';
+import 'package:bidhub/screens/home_screen_customer.dart';
 import 'package:bidhub/screens/home_screen_seller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -53,7 +53,9 @@ class MyAppLoggedIn extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: myTheme,
-      home: const HomeScreenSeller(),
+      home: (UserModel.loggedinUser!.role == 'Seller')
+          ? const HomeScreenSeller()
+          : const HomeScreenCustomer(),
     );
   }
 }
