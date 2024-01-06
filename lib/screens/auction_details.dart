@@ -104,9 +104,18 @@ class _AuctionDetailsState extends State<AuctionDetails> {
                     Icons.bookmark_border_sharp,
                     color: textColorDark,
                   ))
-              : Container(
-                  height: 0,
-                ),
+              : (UserModel.loggedinUser!.role == 'Seller')
+                  ? IconButton(
+                      onPressed: () {
+                        withdrawAuction();
+                      },
+                      icon: const Icon(
+                        Icons.delete_forever_outlined,
+                        color: textColorDark,
+                      ))
+                  : Container(
+                      height: 0,
+                    ),
         ],
       ),
       extendBodyBehindAppBar: true,
@@ -286,40 +295,32 @@ class _AuctionDetailsState extends State<AuctionDetails> {
                             backgroundColor:
                                 MaterialStatePropertyAll(containerColor)),
                         onPressed: () {
-                          if (UserModel.loggedinUser!.role == 'Seller') {
-                            withdrawAuction();
+                          if (DateTime.parse(
+                                      widget.auctionModel.startDate ?? '')
+                                  .isBefore(DateTime.now()) &&
+                              DateTime.parse(widget.auctionModel.endDate ?? '')
+                                  .isAfter(DateTime.now())) {
+                            navigate(context,
+                                BiddingPage(auctionModel: widget.auctionModel));
                           } else {
-                            if (DateTime.parse(
-                                        widget.auctionModel.startDate ?? '')
-                                    .isBefore(DateTime.now()) &&
-                                DateTime.parse(
-                                        widget.auctionModel.endDate ?? '')
-                                    .isAfter(DateTime.now())) {
+                            if (DateTime.now().isBefore(DateTime.parse(
+                                widget.auctionModel.startDate ?? ''))) {
+                              showCustomSnackbar(
+                                  context: context,
+                                  content:
+                                      'Bidding event has not started yet!');
+                            } else {
                               navigate(
                                   context,
                                   BiddingPage(
                                       auctionModel: widget.auctionModel));
-                            } else {
-                              if (DateTime.now().isBefore(DateTime.parse(
-                                  widget.auctionModel.startDate ?? ''))) {
-                                showCustomSnackbar(
-                                    context: context,
-                                    content:
-                                        'Bidding event has not started yet!');
-                              } else {
-                                showCustomSnackbar(
-                                    context: context,
-                                    content: 'Bidding event has been ended!');
-                              }
                             }
                           }
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            (UserModel.loggedinUser!.role == 'Seller')
-                                ? 'Withdraw Auction'
-                                : 'Go to Bids',
+                            'Go to Bids',
                             style: myTheme.textTheme.displaySmall!
                                 .copyWith(color: textColorLight),
                           ),

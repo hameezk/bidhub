@@ -5,7 +5,6 @@ import 'package:bidhub/models/property_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
-
 import '../helpers/firebase_helper.dart';
 import '../models/auction_model.dart';
 import '../models/message_model.dart';
@@ -40,9 +39,10 @@ class CountdownState extends State<Countdown> {
     int hours = (totalSeconds % 86400) ~/ 3600;
     int minutes = (totalSeconds % 3600) ~/ 60;
     int seconds = totalSeconds % 60;
-    if ('${twoDigits(hours)}:${twoDigits(minutes)}:${twoDigits(seconds)}' ==
-        '00:00:00') {
-      endAuctionCar(context, widget.auctionModel!);
+    if (totalSeconds == 0) {
+      (widget.auctionModel == null)
+          ? endAuctionProperty(context, widget.propertyModel!)
+          : endAuctionCar(context, widget.auctionModel!);
     }
     return (days > 0)
         ? '$days:${twoDigits(hours)}:${twoDigits(minutes)}:${twoDigits(seconds)}'
@@ -95,24 +95,49 @@ class CountdownState extends State<Countdown> {
   }
 
   endAuctionCar(BuildContext context, AuctionModel auctionModel) async {
-    auctionModel.isActive = false;
-    await FirebaseFirestore.instance
-        .collection("auction")
-        .doc(auctionModel.id)
-        .set(auctionModel.toMap())
-        .then(
-      (value) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: Colors.blueGrey,
-            duration: Duration(seconds: 1),
-            content: Text("Auction closed"),
-          ),
-        );
-        Map winningBid = auctionModel.bids!.last;
-        sendMessageCar(winningBid, auctionModel.id ?? '');
-      },
-    );
+    if (auctionModel.isActive ?? false) {
+      auctionModel.isActive = false;
+      await FirebaseFirestore.instance
+          .collection("auction")
+          .doc(auctionModel.id)
+          .set(auctionModel.toMap())
+          .then(
+        (value) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              backgroundColor: Colors.blueGrey,
+              duration: Duration(seconds: 1),
+              content: Text("Auction closed"),
+            ),
+          );
+          Map winningBid = auctionModel.bids!.last;
+          sendMessageCar(winningBid, auctionModel.id ?? '');
+        },
+      );
+    }
+  }
+
+  endAuctionProperty(BuildContext context, PropertyModel auctionModel) async {
+    if (auctionModel.isActive ?? false) {
+      auctionModel.isActive = false;
+      await FirebaseFirestore.instance
+          .collection("properties")
+          .doc(auctionModel.id)
+          .set(auctionModel.toMap())
+          .then(
+        (value) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              backgroundColor: Colors.blueGrey,
+              duration: Duration(seconds: 1),
+              content: Text("Auction closed"),
+            ),
+          );
+          Map winningBid = auctionModel.bids!.last;
+          sendMessageCar(winningBid, auctionModel.id ?? '');
+        },
+      );
+    }
   }
 
   Future<void> sendMessageCar(Map winningBid, String auctionModelId) async {
@@ -127,6 +152,7 @@ class CountdownState extends State<Countdown> {
         text: 'Congragulations on winning the bid',
         seen: false,
         auctionLink: auctionModelId,
+        auctionType: (widget.auctionModel == null) ? 'property' : 'car',
       );
 
       FirebaseFirestore.instance

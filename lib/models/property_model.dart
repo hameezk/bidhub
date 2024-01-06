@@ -145,9 +145,9 @@ class PropertyModel {
           'Malir cantt Askari 5,  Scetor J, Brigadier House for sale, 5 Bedrooms',
       ownerId: 'VfyKUQ2pBlMwPzGlmkSLz8dWJYB3',
       bedrooms: '2',
-      startDate: (DateTime.now().add(const Duration(days: 1))).toString(),
+      startDate: (DateTime.now().add(const Duration(days: 30))).toString(),
       endDate:
-          (DateTime.now().add(const Duration(days: 1, hours: 5))).toString(),
+          (DateTime.now().add(const Duration(days: 30, hours: 5))).toString(),
       location:
           'Askari 5 - Sector J, Askari 5, Malir Cantonment, Cantt, Karachi, Sindh',
       startingBid: '60000000',
@@ -173,9 +173,9 @@ class PropertyModel {
           'Bahria Town - Precinct 10-B House For Sale Sized 152 Square Yards',
       ownerId: 'VfyKUQ2pBlMwPzGlmkSLz8dWJYB3',
       bedrooms: '2',
-      startDate: (DateTime.now().add(const Duration(days: 1))).toString(),
+      startDate: (DateTime.now().add(const Duration(days: 30))).toString(),
       endDate:
-          (DateTime.now().add(const Duration(days: 1, hours: 5))).toString(),
+          (DateTime.now().add(const Duration(days: 30, hours: 5))).toString(),
       location:
           'Askari 5 - Sector J, Askari 5, Malir Cantonment, Cantt, Karachi, Sindh',
       startingBid: '60000000',
@@ -201,9 +201,9 @@ class PropertyModel {
           'Gulistan-e-Jauhar - Block 15, Gulistan-e-Jauhar, Karachi, Sindh',
       ownerId: 'VfyKUQ2pBlMwPzGlmkSLz8dWJYB3',
       bedrooms: '2',
-      startDate: (DateTime.now().add(const Duration(days: 1))).toString(),
+      startDate: (DateTime.now().add(const Duration(days: 30))).toString(),
       endDate:
-          (DateTime.now().add(const Duration(days: 1, hours: 5))).toString(),
+          (DateTime.now().add(const Duration(days: 30, hours: 5))).toString(),
       location:
           'Askari 5 - Sector J, Askari 5, Malir Cantonment, Cantt, Karachi, Sindh',
       startingBid: '60000000',

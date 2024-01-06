@@ -11,12 +11,10 @@ import 'package:bidhub/screens/bids_show.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
-
 import '../config/colors.dart';
 import '../config/get_chatroom.dart';
 import '../config/size.dart';
 import '../models/chatroom_model.dart';
-import '../models/message_model.dart';
 import 'chat_page.dart';
 
 class BiddingPage extends StatefulWidget {
@@ -320,62 +318,70 @@ class _BiddingPageState extends State<BiddingPage> {
               ),
 
               // Bid form.
-              SizedBox(
-                width: width(context) * 0.6,
-                child: TextFormField(
-                  controller: bidController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: 'Your Bid',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (auctionModel.winingBid == '') {
-                      if (double.parse(value ?? '0') <=
-                          double.parse(auctionModel.startingBid ?? '0')) {
-                        return 'Bid cannot be less than current bid';
-                      }
-                      return null;
-                    } else {
-                      if (double.parse(value ?? '0') <=
-                          double.parse(auctionModel.winingBid ?? '0')) {
-                        return 'Bid cannot be less than current bid';
-                      }
-                      return null;
-                    }
-                  },
-                ),
-              ),
+              (auctionModel.isActive ?? false)
+                  ? Column(
+                      children: [
+                        SizedBox(
+                          width: width(context) * 0.6,
+                          child: TextFormField(
+                            controller: bidController,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              labelText: 'Your Bid',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (auctionModel.winingBid == '') {
+                                if (double.parse(value ?? '0') <=
+                                    double.parse(
+                                        auctionModel.startingBid ?? '0')) {
+                                  return 'Bid cannot be less than current bid';
+                                }
+                                return null;
+                              } else {
+                                if (double.parse(value ?? '0') <=
+                                    double.parse(
+                                        auctionModel.winingBid ?? '0')) {
+                                  return 'Bid cannot be less than current bid';
+                                }
+                                return null;
+                              }
+                            },
+                          ),
+                        ),
 
-              const SizedBox(
-                height: 10,
-              ),
+                        const SizedBox(
+                          height: 10,
+                        ),
 
-              // Bid button.
-              ElevatedButton(
-                onPressed: () {
-                  if (DateTime.now()
-                      .isBefore(DateTime.parse(auctionModel.endDate ?? ""))) {
-                    if (_formKey.currentState!.validate()) {
-                      Map currentBid = {
-                        'bidId': uuid.v1(),
-                        'bidderId': UserModel.loggedinUser!.id,
-                        'bidderName': UserModel.loggedinUser!.name,
-                        'bidderImage': UserModel.loggedinUser!.image,
-                        'bidValue': bidController.text.trim(),
-                      };
-                      uploadBid(auctionModel, currentBid);
-                    }
-                  } else {
-                    showCustomSnackbar(
-                        context: context,
-                        content: 'Bidding Event has been ended!');
-                  }
-                },
-                child: const Text('Place Bid'),
-              ),
+                        // Bid button.
+                        ElevatedButton(
+                          onPressed: () {
+                            if (DateTime.now().isBefore(
+                                DateTime.parse(auctionModel.endDate ?? ""))) {
+                              if (_formKey.currentState!.validate()) {
+                                Map currentBid = {
+                                  'bidId': uuid.v1(),
+                                  'bidderId': UserModel.loggedinUser!.id,
+                                  'bidderName': UserModel.loggedinUser!.name,
+                                  'bidderImage': UserModel.loggedinUser!.image,
+                                  'bidValue': bidController.text.trim(),
+                                };
+                                uploadBid(auctionModel, currentBid);
+                              }
+                            } else {
+                              showCustomSnackbar(
+                                  context: context,
+                                  content: 'Bidding Event has been ended!');
+                            }
+                          },
+                          child: const Text('Place Bid'),
+                        ),
+                      ],
+                    )
+                  : Container(height: 0),
             ],
           ),
         ),
@@ -441,38 +447,8 @@ class _BiddingPageState extends State<BiddingPage> {
             content: Text("Auction closed"),
           ),
         );
-        Map winningBid = auctionModel.bids!.last;
-        sendMessage(winningBid, auctionModel.id ?? '');
       },
     );
   }
 
-  Future<void> sendMessage(Map winningBid, String auctionModelId) async {
-    UserModel? winnerUserodel =
-        await FirebaseHelper.getUserModelById(winningBid['bidderId']);
-    ChatroomModel? chatroomModel = await getChatroomModelAdmin(winnerUserodel!);
-    if (chatroomModel != null) {
-      MessageModel newMessage = MessageModel(
-        messageId: uuid.v1(),
-        sender: 'tBuAzA90NffCXIyfMiKR0Nw3RHc2',
-        createdon: DateTime.now().toString(),
-        text: 'Congragulations on winning the bid',
-        seen: false,
-        auctionLink: auctionModelId,
-      );
-
-      FirebaseFirestore.instance
-          .collection("chatrooms")
-          .doc(chatroomModel.chatroomId)
-          .collection("messages")
-          .doc(newMessage.messageId)
-          .set(newMessage.toMap());
-
-      chatroomModel.lastMessage = 'Congragulations on winning the bid';
-      FirebaseFirestore.instance
-          .collection("chatrooms")
-          .doc(chatroomModel.chatroomId)
-          .set(chatroomModel.toMap());
-    }
   }
-}

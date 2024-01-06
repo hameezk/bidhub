@@ -1,4 +1,14 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:bidhub/config/colors.dart';
+import 'package:bidhub/config/navigate.dart';
+import 'package:bidhub/config/size.dart';
+import 'package:bidhub/config/snackbar.dart';
+import 'package:bidhub/helpers/firebase_helper.dart';
+import 'package:bidhub/models/auction_model.dart';
+import 'package:bidhub/models/property_model.dart';
+import 'package:bidhub/screens/auction_details.dart';
+import 'package:bidhub/screens/property_details.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../main.dart';
@@ -197,6 +207,12 @@ class ChatRoomState extends State<ChatRoom> {
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       Container(
+                                        constraints: BoxConstraints(
+                                          minWidth: 10,
+                                          maxWidth: width(context) * 0.6,
+                                          maxHeight: 1000000,
+                                          minHeight: 10,
+                                        ),
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 10,
                                           vertical: 10,
@@ -206,12 +222,13 @@ class ChatRoomState extends State<ChatRoom> {
                                               BorderRadius.circular(20),
                                           color: containerColor,
                                         ),
-                                        child:
-                                            Text(currentMessage.text.toString(),
-                                                maxLines: 20,
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                )),
+                                        child: Text(
+                                          currentMessage.text.toString(),
+                                          maxLines: 20,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -233,6 +250,12 @@ class ChatRoomState extends State<ChatRoom> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Container(
+                                        constraints: BoxConstraints(
+                                          minWidth: 10,
+                                          maxWidth: width(context) * 0.6,
+                                          maxHeight: 1000000,
+                                          minHeight: 10,
+                                        ),
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 10,
                                           vertical: 10,
@@ -242,12 +265,29 @@ class ChatRoomState extends State<ChatRoom> {
                                               BorderRadius.circular(20),
                                           color: textColorLight,
                                         ),
-                                        child:
-                                            Text(currentMessage.text.toString(),
+                                        child: ((currentMessage.auctionLink ==
+                                                ''))
+                                            ? Text(
+                                                currentMessage.text.toString(),
                                                 maxLines: 20,
                                                 style: const TextStyle(
                                                   color: canvasColor,
-                                                )),
+                                                ))
+                                            : GestureDetector(
+                                                onTap: () => getAuctionModel(
+                                                    currentMessage
+                                                            .auctionLink ??
+                                                        '',
+                                                    currentMessage
+                                                            .auctionType ??
+                                                        ''),
+                                                child: Text(
+                                                    "${currentMessage.text}. Tap on this message to follow along the Auction Details",
+                                                    maxLines: 20,
+                                                    style: const TextStyle(
+                                                      color: canvasColor,
+                                                    )),
+                                              ),
                                       ),
                                     ],
                                   ),
@@ -277,35 +317,62 @@ class ChatRoomState extends State<ChatRoom> {
                 },
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              child: Row(
-                children: [
-                  Flexible(
-                    child: TextField(
-                      controller: messageController,
-                      maxLines: null,
-                      style: const TextStyle(color: Colors.blueGrey),
-                      decoration: const InputDecoration(
-                        hintText: "Enter Message...",
-                        hintStyle: TextStyle(color: Colors.blueGrey),
-                      ),
+            (widget.targetUser.role != "Admin")
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
+                    child: Row(
+                      children: [
+                        Flexible(
+                          child: TextField(
+                            controller: messageController,
+                            maxLines: null,
+                            style: const TextStyle(color: Colors.blueGrey),
+                            decoration: const InputDecoration(
+                              hintText: "Enter Message...",
+                              hintStyle: TextStyle(color: Colors.blueGrey),
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                            onPressed: () {
+                              sendMessage();
+                            },
+                            icon: const Icon(
+                              Icons.send,
+                              color: Colors.blueGrey,
+                            ))
+                      ],
                     ),
-                  ),
-                  IconButton(
-                      onPressed: () {
-                        sendMessage();
-                      },
-                      icon: const Icon(
-                        Icons.send,
-                        color: Colors.blueGrey,
-                      ))
-                ],
-              ),
-            )
+                  )
+                : Container(height: 50)
           ],
         ),
       ),
     );
+  }
+
+  getAuctionModel(String auctionId, String auctionType) async {
+    if (auctionType == 'car') {
+      AuctionModel? auctionModel =
+          await FirebaseHelper.getCarAuctoionModelById(auctionId);
+      (auctionModel != null)
+          ? navigate(context, AuctionDetails(auctionModel: auctionModel))
+          : showCustomSnackbar(
+              context: context,
+              content: 'An error occoured! PLease try again later');
+    } else if (auctionType == 'property') {
+      PropertyModel? propertyModel =
+          await FirebaseHelper.getPropertyAuctoionModelById(auctionId);
+      (propertyModel != null)
+          ? navigate(context, PropertyDetails(propertyModel: propertyModel))
+          : showCustomSnackbar(
+              context: context,
+              content: 'An error occoured! PLease try again later');
+    } else {
+      showCustomSnackbar(
+          context: context,
+          content: 'An error occoured! PLease try again later');
+    }
   }
 }
