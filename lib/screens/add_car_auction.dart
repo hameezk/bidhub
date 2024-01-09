@@ -53,6 +53,7 @@ class _AddAuctionState extends State<AddAuction> {
   DateTime? startTime;
   DateTime? endTime;
   TimeOfDay? picked = TimeOfDay.now();
+  File? imageFile;
   Uuid uuid = const Uuid();
   List features = [
     {
@@ -396,6 +397,74 @@ class _AddAuctionState extends State<AddAuction> {
                       const SizedBox(height: 50.0),
                       GestureDetector(
                         onTap: () {
+                          showInspectionOptions();
+                        },
+                        onLongPress: () {
+                          if (imageFile != null) {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  elevation: 1,
+                                  backgroundColor: Colors.white,
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        height: height(context) * 0.7,
+                                        width: width(context) * 0.7,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          image: DecorationImage(
+                                            image: FileImage(imageFile!),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: textColorLight.withOpacity(0.7)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(24.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Padding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 8.0),
+                                  child: Icon(
+                                    Icons.featured_play_list_outlined,
+                                    color: textColorDark,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: width(context) * 0.6,
+                                  child: Text(
+                                    (imageFile != null)
+                                        ? imageFile!.path.split('/').last
+                                        : 'Upload Inspection Report',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: myTheme.textTheme.displaySmall!
+                                        .copyWith(color: textColorDark),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16.0),
+                      GestureDetector(
+                        onTap: () {
                           datePicker();
                         },
                         child: Row(
@@ -466,7 +535,8 @@ class _AddAuctionState extends State<AddAuction> {
                           if (_formKey.currentState!.validate()) {
                             if (images.isNotEmpty &&
                                 startTime != null &&
-                                endTime != null) {
+                                endTime != null &&
+                                imageFile != null) {
                               uploadData();
                             } else {
                               showCustomSnackbar(
@@ -626,6 +696,54 @@ class _AddAuctionState extends State<AddAuction> {
     );
   }
 
+  void showInspectionOptions() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text(
+            "Upload Inspection Report",
+            style: TextStyle(
+              color: Colors.blueGrey,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                onTap: () {
+                  Navigator.pop(context);
+                  pickInspectionReport(ImageSource.gallery);
+                },
+                leading: const Icon(Icons.photo_album_rounded),
+                title: const Text(
+                  "Select from Gallery",
+                  style: TextStyle(
+                    color: Colors.blueGrey,
+                  ),
+                ),
+              ),
+              ListTile(
+                onTap: () {
+                  Navigator.pop(context);
+                  pickInspectionReport(ImageSource.camera);
+                },
+                leading: const Icon(CupertinoIcons.photo_camera),
+                title: const Text(
+                  "Take new photo",
+                  style: TextStyle(
+                    color: Colors.blueGrey,
+                  ),
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void uploadData() async {
     showLoadingDialog(context, 'Uploading data...');
     for (var image in images) {
@@ -637,6 +755,13 @@ class _AddAuctionState extends State<AddAuction> {
       String imageUrl = await snapshot.ref.getDownloadURL();
       imageLinks.add(imageUrl);
     }
+
+    UploadTask uploadTask = FirebaseStorage.instance
+        .ref("inspectionReports")
+        .child(imageFile!.path)
+        .putFile(imageFile!);
+    TaskSnapshot snapshot = await uploadTask;
+    String reportUrl = await snapshot.ref.getDownloadURL();
 
     AuctionModel auctionModel = AuctionModel(
       id: uuid.v1(),
@@ -663,6 +788,7 @@ class _AddAuctionState extends State<AddAuction> {
       bids: [],
       isActive: true,
       winingBid: '',
+      inspectionReport: reportUrl,
     );
 
     await FirebaseFirestore.instance
@@ -689,5 +815,14 @@ class _AddAuctionState extends State<AddAuction> {
         );
       },
     );
+  }
+
+  Future<void> pickInspectionReport(ImageSource source) async {
+    XFile? selectedImage = await ImagePicker().pickImage(source: source);
+    if (selectedImage != null) {
+      setState(() {
+        imageFile = File(selectedImage.path);
+      });
+    }
   }
 }

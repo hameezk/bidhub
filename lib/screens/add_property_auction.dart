@@ -46,6 +46,7 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
   DateTime? endTime;
   TimeOfDay? picked = TimeOfDay.now();
   Uuid uuid = const Uuid();
+  File? imageFile;
   List features = [
     {
       'feature': 'Built in year',
@@ -350,6 +351,74 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
                         },
                       ),
                       const SizedBox(height: 50.0),
+                      const SizedBox(height: 50.0),
+                      GestureDetector(
+                        onTap: () {
+                          showInspectionOptions();
+                        },
+                        onLongPress: () {
+                          if (imageFile != null) {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  elevation: 1,
+                                  backgroundColor: Colors.white,
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        height: height(context) * 0.7,
+                                        width: width(context) * 0.7,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          image: DecorationImage(
+                                            image: FileImage(imageFile!),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: textColorLight.withOpacity(0.7)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(24.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Padding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 8.0),
+                                  child: Icon(
+                                    Icons.featured_play_list_outlined,
+                                    color: textColorDark,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: width(context) * 0.6,
+                                  child: Text(
+                                    (imageFile != null)
+                                        ? imageFile!.path.split('/').last
+                                        : 'Upload Inspection Report',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: myTheme.textTheme.displaySmall!
+                                        .copyWith(color: textColorDark),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                       GestureDetector(
                         onTap: () {
                           datePicker();
@@ -594,6 +663,13 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
       imageLinks.add(imageUrl);
     }
 
+    UploadTask uploadTask = FirebaseStorage.instance
+        .ref("inspectionReports")
+        .child(imageFile!.path)
+        .putFile(imageFile!);
+    TaskSnapshot snapshot = await uploadTask;
+    String reportUrl = await snapshot.ref.getDownloadURL();
+
     PropertyModel propertyModel = PropertyModel(
       id: uuid.v1(),
       images: imageLinks,
@@ -612,6 +688,7 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
       baths: '',
       bedrooms: '',
       type: '',
+      inspectionReport: reportUrl,
     );
 
     await FirebaseFirestore.instance
@@ -638,5 +715,64 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
         );
       },
     );
+  }
+
+  void showInspectionOptions() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text(
+            "Upload Inspection Report",
+            style: TextStyle(
+              color: Colors.blueGrey,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                onTap: () {
+                  Navigator.pop(context);
+                  pickInspectionReport(ImageSource.gallery);
+                },
+                leading: const Icon(Icons.photo_album_rounded),
+                title: const Text(
+                  "Select from Gallery",
+                  style: TextStyle(
+                    color: Colors.blueGrey,
+                  ),
+                ),
+              ),
+              ListTile(
+                onTap: () {
+                  Navigator.pop(context);
+                  pickInspectionReport(ImageSource.camera);
+                },
+                leading: const Icon(CupertinoIcons.photo_camera),
+                title: const Text(
+                  "Take new photo",
+                  style: TextStyle(
+                    color: Colors.blueGrey,
+                  ),
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+
+
+ Future<void> pickInspectionReport(ImageSource source) async {
+    XFile? selectedImage = await ImagePicker().pickImage(source: source);
+    if (selectedImage != null) {
+      setState(() {
+        imageFile = File(selectedImage.path);
+      });
+    }
   }
 }

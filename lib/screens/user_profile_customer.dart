@@ -210,7 +210,6 @@ class _UserProfileCustomerState extends State<UserProfileCustomer> {
               //         if (snapshot.hasData) {
               //           QuerySnapshot dataSnapshot =
               //               snapshot.data as QuerySnapshot;
-
               //           if (dataSnapshot.docs.isNotEmpty) {
               //             return ListView.builder(
               //                 padding: EdgeInsets.zero,
@@ -219,7 +218,6 @@ class _UserProfileCustomerState extends State<UserProfileCustomer> {
               //                   Map<String, dynamic> auctionMap =
               //                       dataSnapshot.docs[index].data()
               //                           as Map<String, dynamic>;
-
               //                   auctionModel auctionModel =
               //                       auctionModel.fromMap(auctionMap);
               //                   if (auctionModel.carName!

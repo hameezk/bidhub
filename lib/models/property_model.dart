@@ -19,6 +19,7 @@ class PropertyModel {
   List? bids;
   bool? isActive;
   String? winingBid;
+  String? inspectionReport;
 
   PropertyModel({
     required this.id,
@@ -38,6 +39,7 @@ class PropertyModel {
     required this.bids,
     required this.isActive,
     required this.winingBid,
+    required this.inspectionReport,
   });
 
   PropertyModel.fromMap(Map<String, dynamic> map) {
@@ -58,6 +60,7 @@ class PropertyModel {
     bids = map["bids"];
     isActive = map["isActive"];
     winingBid = map["winingBid"];
+    inspectionReport = map["inspectionReport"];
   }
 
   Map<String, dynamic> toMap() {
@@ -79,6 +82,7 @@ class PropertyModel {
       "bids": bids,
       "isActive": isActive,
       "winingBid": winingBid,
+      "inspectionReport": inspectionReport,
     };
   }
 
@@ -157,6 +161,7 @@ class PropertyModel {
       bids: [],
       isActive: true,
       winingBid: '',
+      inspectionReport:'',
     ),
     PropertyModel(
       id: '3',
@@ -184,6 +189,7 @@ class PropertyModel {
       features: demoFeatures,
       bids: [],
       isActive: true,
+      inspectionReport:'',
       winingBid: '',
     ),
     PropertyModel(
@@ -212,6 +218,7 @@ class PropertyModel {
       features: demoFeatures,
       bids: [],
       isActive: true,
+      inspectionReport:'',
       winingBid: '',
     ),
   ];

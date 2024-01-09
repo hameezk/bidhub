@@ -68,7 +68,7 @@ class ChatRoomState extends State<ChatRoom> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
         backgroundColor: Theme.of(context).canvasColor,
         title: Row(
           children: [
