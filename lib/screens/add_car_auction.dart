@@ -5,6 +5,7 @@ import 'package:bidhub/config/size.dart';
 import 'package:bidhub/config/snackbar.dart';
 import 'package:bidhub/config/theme.dart';
 import 'package:bidhub/models/auction_model.dart';
+import 'package:bidhub/models/inspection_report_car.dart';
 import 'package:bidhub/models/user_model.dart';
 import 'package:bidhub/screens/add_property_auction.dart';
 import 'package:bidhub/screens/home_screen_seller.dart';
@@ -12,6 +13,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
@@ -462,6 +464,12 @@ class _AddAuctionState extends State<AddAuction> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 30.0),
+                      (imageFile != null)
+                          ? buildInspectionReportForm()
+                          : Container(
+                              height: 0,
+                            ),
                       const SizedBox(height: 16.0),
                       GestureDetector(
                         onTap: () {
@@ -824,5 +832,39 @@ class _AddAuctionState extends State<AddAuction> {
         imageFile = File(selectedImage.path);
       });
     }
+  }
+
+  Future<String> readTextFromImage() async {
+    final inputImage = InputImage.fromFile(imageFile!);
+    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+    final RecognizedText recognizedText =
+        await textRecognizer.processImage(inputImage);
+    String text = recognizedText.text;
+
+    textRecognizer.close();
+
+    return text;
+  }
+  
+  buildInspectionReportForm() {
+    return FutureBuilder(
+      future: readTextFromImage(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return Container(
+            child: Text(CarReport.parseInspectionReport(snapshot.data!)),
+          );
+        } else {
+          return const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: containerColor,
+              ),
+            ],
+          );
+        }
+      },
+    );
   }
 }

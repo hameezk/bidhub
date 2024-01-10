@@ -6,6 +6,7 @@ import 'package:bidhub/config/loading_dialoge.dart';
 import 'package:bidhub/config/size.dart';
 import 'package:bidhub/config/snackbar.dart';
 import 'package:bidhub/config/theme.dart';
+import 'package:bidhub/models/inspection_report_property.dart';
 import 'package:bidhub/models/user_model.dart';
 import 'package:bidhub/screens/add_car_auction.dart';
 import 'package:bidhub/screens/home_screen_seller.dart';
@@ -377,7 +378,7 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
                                               BorderRadius.circular(20),
                                           image: DecorationImage(
                                             image: FileImage(imageFile!),
-                                            fit: BoxFit.cover,
+                                            fit: BoxFit.fitWidth,
                                           ),
                                         ),
                                       ),
@@ -801,7 +802,7 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return Container(
-            child: Text(snapshot.data!),
+            child: Text(PropertyReport.parseInspectionReport(snapshot.data!)),
           );
         } else {
           return const Row(
