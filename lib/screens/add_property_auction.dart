@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'package:bidhub/config/bottombar.dart';
 import 'package:bidhub/config/loading_dialoge.dart';
@@ -11,6 +13,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
@@ -351,7 +354,6 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
                         },
                       ),
                       const SizedBox(height: 50.0),
-                      const SizedBox(height: 50.0),
                       GestureDetector(
                         onTap: () {
                           showInspectionOptions();
@@ -419,6 +421,13 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 30.0),
+                      (imageFile != null)
+                          ? buildInspectionReportForm()
+                          : Container(
+                              height: 0,
+                            ),
+                      const SizedBox(height: 30.0),
                       GestureDetector(
                         onTap: () {
                           datePicker();
@@ -655,7 +664,7 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
     showLoadingDialog(context, 'Uploading data...');
     for (var image in images) {
       UploadTask uploadTask = FirebaseStorage.instance
-          .ref("carPictures")
+          .ref("PropertyPictures")
           .child(image.path)
           .putFile(image);
       TaskSnapshot snapshot = await uploadTask;
@@ -684,15 +693,15 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
       bids: [],
       isActive: true,
       winingBid: '',
-      area: '',
-      baths: '',
-      bedrooms: '',
-      type: '',
+      area: areaController.text.trim(),
+      baths: bathsController.text.trim(),
+      bedrooms: bedroomController.text.trim(),
+      type: typeController.text.trim(),
       inspectionReport: reportUrl,
     );
 
     await FirebaseFirestore.instance
-        .collection("auction")
+        .collection("properties")
         .doc(propertyModel.id)
         .set(propertyModel.toMap())
         .then(
@@ -765,14 +774,46 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
     );
   }
 
+  Future<String> readTextFromImage() async {
+    final inputImage = InputImage.fromFile(imageFile!);
+    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+    final RecognizedText recognizedText =
+        await textRecognizer.processImage(inputImage);
+    String text = recognizedText.text;
 
+    textRecognizer.close();
 
- Future<void> pickInspectionReport(ImageSource source) async {
+    return text;
+  }
+
+  Future<void> pickInspectionReport(ImageSource source) async {
     XFile? selectedImage = await ImagePicker().pickImage(source: source);
     if (selectedImage != null) {
       setState(() {
         imageFile = File(selectedImage.path);
       });
     }
+  }
+
+  buildInspectionReportForm() {
+    return FutureBuilder(
+      future: readTextFromImage(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return Container(
+            child: Text(snapshot.data!),
+          );
+        } else {
+          return const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: containerColor,
+              ),
+            ],
+          );
+        }
+      },
+    );
   }
 }
