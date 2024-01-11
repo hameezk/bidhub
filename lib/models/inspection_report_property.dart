@@ -51,7 +51,7 @@ class PropertyReport {
     required this.peoplePresent,
   });
 
-  static String parseInspectionReport(String? recognizedText) {
+  static PropertyReport parseInspectionReport(String? recognizedText) {
     var parts = recognizedText!.split('\n');
     String reportId = parts[3].replaceAll('Report Id: ', '').trim();
     String reportDate = parts[15].replaceAll('Report Date: ', '').trim();
@@ -65,7 +65,7 @@ class PropertyReport {
     String clientContact = parts[7].replaceAll('Client Contact: ', '').trim();
     String overallScore = parts[19].replaceAll('Overall Score: ', '').trim();
     String locationScore = parts[8].replaceAll('Location Score: ', '').trim();
-    String confortScore = parts[20].replaceAll('Confort Score: ', '').trim();
+    String confortScore = parts[20].replaceAll('Comfort Score: ', '').trim();
     String houseFacing = parts[9].replaceAll('House Facing: ', '').trim();
     String houseAge = parts[21].replaceAll('House Age: ', '').trim();
     String streetType = parts[10].replaceAll('Street Type: ', '').trim();
@@ -107,6 +107,6 @@ class PropertyReport {
       peoplePresent: peoplePresent,
     );
 
-    return reportId;
+    return propertyReport;
   }
 }

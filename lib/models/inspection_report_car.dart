@@ -51,7 +51,7 @@ class CarReport {
     required this.milage,
   });
 
-  static parseInspectionReport(String? recognizedText) async {
+  static CarReport parseInspectionReport(String? recognizedText) {
     var parts = recognizedText!.split('\n');
     String reportId = parts[3].replaceAll('Report Id: ', '').trim();
     String reportDate = parts[15].replaceAll('Report Date: ', '').trim();
@@ -69,15 +69,17 @@ class CarReport {
     String carMake = parts[9].replaceAll('Car Make: ', '').trim();
     String carModel = parts[21].replaceAll('Car Model: ', '').trim();
     String carVarient = parts[10].replaceAll('Car Varient: ', '').trim();
-    String carRegistration = parts[22].replaceAll('Car Registration: ', '').trim();
+    String carRegistration =
+        parts[22].replaceAll('Car Registration: ', '').trim();
     String engineNo = parts[11].replaceAll('Engine No.: ', '').trim();
     String chasisNo = parts[23].replaceAll('Chasis No.: ', '').trim();
     String carColor = parts[12].replaceAll('Car Color: ', '').trim();
-    String accidented =
-        parts[24].replaceAll('Accidented: ', '').trim();
+    String accidented = parts[24].replaceAll('Accidented: ', '').trim();
     String bodyType = parts[13].replaceAll('Body Type: ', '').trim();
-    String seatingCapacity = parts[25].replaceAll('Seating Capacity: ', '').trim();
-    String engineCapacity = parts[14].replaceAll('Engine Capacity: ', '').trim();
+    String seatingCapacity =
+        parts[25].replaceAll('Seating Capacity: ', '').trim();
+    String engineCapacity =
+        parts[14].replaceAll('Engine Capacity: ', '').trim();
     String milage = parts[26].replaceAll('Milage: ', '').trim();
 
     CarReport carReport = CarReport(
@@ -107,6 +109,6 @@ class CarReport {
       milage: milage,
     );
 
-    return reportId;
+    return carReport;
   }
 }

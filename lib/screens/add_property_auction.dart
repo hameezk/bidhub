@@ -42,6 +42,11 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
   TextEditingController startingDateController = TextEditingController();
   TextEditingController endDateController = TextEditingController();
   TextEditingController noneController = TextEditingController();
+  final TextEditingController overallScoreController = TextEditingController();
+  final TextEditingController locationScoreController = TextEditingController();
+  final TextEditingController comfortScoreController = TextEditingController();
+  final TextEditingController inspectionDateController =
+      TextEditingController();
   List<File> images = [];
   List<String> imageLinks = [];
   DateTime? biddingDate;
@@ -604,6 +609,18 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
     );
   }
 
+  TextFormField buildInspectionTextFormFeild(
+      TextEditingController controller, String label) {
+    return TextFormField(
+      controller: controller,
+      readOnly: true,
+      decoration: InputDecoration(
+        labelText: label,
+        border: InputBorder.none,
+      ),
+    );
+  }
+
   void selectImage(ImageSource source) async {
     XFile? selectedImage = await ImagePicker().pickImage(source: source);
     if (selectedImage != null) {
@@ -801,8 +818,25 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
       future: readTextFromImage(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return Container(
-            child: Text(PropertyReport.parseInspectionReport(snapshot.data!)),
+          PropertyReport propertyReport =
+              PropertyReport.parseInspectionReport(snapshot.data!);
+          overallScoreController.text = propertyReport.overallScore ?? "";
+          locationScoreController.text = propertyReport.locationScore ?? "";
+          comfortScoreController.text = propertyReport.confortScore ?? "";
+          inspectionDateController.text = propertyReport.inspectionDate ?? "";
+          return Form(
+            child: Column(
+              children: [
+                buildInspectionTextFormFeild(
+                    overallScoreController, 'Overall Score'),
+                buildInspectionTextFormFeild(
+                    locationScoreController, 'Location Score'),
+                buildInspectionTextFormFeild(
+                    comfortScoreController, 'Comfort Score'),
+                buildInspectionTextFormFeild(
+                    inspectionDateController, 'Inspection Date'),
+              ],
+            ),
           );
         } else {
           return const Row(

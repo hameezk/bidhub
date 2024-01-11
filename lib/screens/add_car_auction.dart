@@ -48,6 +48,11 @@ class _AddAuctionState extends State<AddAuction> {
   final TextEditingController startingBidController = TextEditingController();
   final TextEditingController startingDateController = TextEditingController();
   final TextEditingController endDateController = TextEditingController();
+  final TextEditingController overallScoreController = TextEditingController();
+  final TextEditingController bodyScoreController = TextEditingController();
+  final TextEditingController engineScoreController = TextEditingController();
+  final TextEditingController inspectionDateController =
+      TextEditingController();
   List<File> images = [];
   List<String> imageLinks = [];
   DateTime? biddingDate;
@@ -845,14 +850,29 @@ class _AddAuctionState extends State<AddAuction> {
 
     return text;
   }
-  
+
   buildInspectionReportForm() {
     return FutureBuilder(
       future: readTextFromImage(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return Container(
-            child: Text(CarReport.parseInspectionReport(snapshot.data!)),
+          CarReport carReport = CarReport.parseInspectionReport(snapshot.data!);
+          overallScoreController.text = carReport.overallScore ?? "";
+          bodyScoreController.text = carReport.bodyScore ?? "";
+          engineScoreController.text = carReport.engineScore ?? "";
+          inspectionDateController.text = carReport.inspectionDate ?? "";
+          return Form(
+            child: Column(
+              children: [
+                buildInspectionTextFormFeild(
+                    overallScoreController, 'Overall Score'),
+                buildInspectionTextFormFeild(bodyScoreController, 'Body Score'),
+                buildInspectionTextFormFeild(
+                    engineScoreController, 'Engine Score'),
+                buildInspectionTextFormFeild(
+                    inspectionDateController, 'Inspection Date'),
+              ],
+            ),
           );
         } else {
           return const Row(
@@ -865,6 +885,18 @@ class _AddAuctionState extends State<AddAuction> {
           );
         }
       },
+    );
+  }
+
+  TextFormField buildInspectionTextFormFeild(
+      TextEditingController controller, String label) {
+    return TextFormField(
+      controller: controller,
+      readOnly: true,
+      decoration: InputDecoration(
+        labelText: label,
+        border: InputBorder.none,
+      ),
     );
   }
 }
