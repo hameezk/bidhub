@@ -871,6 +871,37 @@ class _AddAuctionState extends State<AddAuction> {
                     engineScoreController, 'Engine Score'),
                 buildInspectionTextFormFeild(
                     inspectionDateController, 'Inspection Date'),
+                GestureDetector(
+                  onTap: () {
+                    buildInspectionDialog(carReport);
+                  },
+                  child: Container(
+                    height: 60,
+                    width: width(context) * 0.9,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: textColorLight.withOpacity(0.75),
+                    ),
+                    child: const Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'See All Details   ',
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: textColorDark),
+                          ),
+                          Icon(
+                            Icons.arrow_forward,
+                            color: textColorDark,
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           );
@@ -897,6 +928,134 @@ class _AddAuctionState extends State<AddAuction> {
         labelText: label,
         border: InputBorder.none,
       ),
+    );
+  }
+
+  buildInspectionDialog(CarReport carReport) {
+    final TextEditingController reportIdController = TextEditingController();
+    final TextEditingController inspectionTimeController =
+        TextEditingController();
+    final TextEditingController reportDateController = TextEditingController();
+    final TextEditingController agentNameController = TextEditingController();
+    final TextEditingController agentContactController =
+        TextEditingController();
+    final TextEditingController clientNameController = TextEditingController();
+    final TextEditingController carNumberController = TextEditingController();
+    final TextEditingController clientContactController =
+        TextEditingController();
+    final TextEditingController carMakeController = TextEditingController();
+    final TextEditingController carModelController = TextEditingController();
+    final TextEditingController carVarientController = TextEditingController();
+    final TextEditingController carRegistrationController =
+        TextEditingController();
+    final TextEditingController engineNoController = TextEditingController();
+    final TextEditingController chasisNoController = TextEditingController();
+    final TextEditingController carColorController = TextEditingController();
+    final TextEditingController accidentedController = TextEditingController();
+    final TextEditingController bodyTypeController = TextEditingController();
+    final TextEditingController seatingCapacityController =
+        TextEditingController();
+    final TextEditingController engineCapacityController =
+        TextEditingController();
+    final TextEditingController milageController = TextEditingController();
+
+    reportIdController.text = carReport.reportId ?? '';
+    inspectionDateController.text = carReport.inspectionDate ?? '';
+    inspectionTimeController.text = carReport.inspectionTime ?? '';
+    agentNameController.text = carReport.agentName ?? '';
+    agentContactController.text = carReport.agentContact ?? '';
+    clientNameController.text = carReport.clientName ?? '';
+    clientContactController.text = carReport.clientContact ?? '';
+    carNumberController.text = carReport.carNumber ?? '';
+    overallScoreController.text = carReport.overallScore ?? '';
+    bodyScoreController.text = carReport.bodyScore ?? '';
+    engineScoreController.text = carReport.engineScore ?? '';
+    carMakeController.text = carReport.carMake ?? '';
+    carModelController.text = carReport.carModel ?? '';
+    carVarientController.text = carReport.carVarient ?? '';
+    carRegistrationController.text = carReport.carRegistration ?? '';
+    engineNoController.text = carReport.engineNo ?? '';
+    chasisNoController.text = carReport.chasisNo ?? '';
+    carColorController.text = carReport.carColor ?? '';
+    accidentedController.text = carReport.accidented ?? '';
+    bodyTypeController.text = carReport.bodyType ?? '';
+    seatingCapacityController.text = carReport.seatingCapacity ?? '';
+    engineCapacityController.text = carReport.engineCapacity ?? '';
+    milageController.text = carReport.milage ?? '';
+    reportDateController.text = carReport.reportDate ?? '';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          elevation: 1,
+          backgroundColor: Colors.white,
+          title: const Text(
+            "Car Inspection Report",
+            style: TextStyle(
+              color: textColorDark,
+            ),
+          ),
+          content: SizedBox(
+            height: height(context) * 0.7,
+            width: width(context) * 0.7,
+            child: SingleChildScrollView(
+              child: Form(
+                child: Column(
+                  children: [
+                    buildInspectionTextFormFeild(
+                        reportIdController, 'Report Id'),
+                    buildInspectionTextFormFeild(
+                        reportDateController, 'Report Date'),
+                    buildInspectionTextFormFeild(
+                        inspectionDateController, 'Inspection Date'),
+                    buildInspectionTextFormFeild(
+                        inspectionTimeController, 'Inspection Time'),
+                    buildInspectionTextFormFeild(
+                        agentNameController, 'Agent Name'),
+                    buildInspectionTextFormFeild(
+                        agentContactController, 'Agent Contact'),
+                    buildInspectionTextFormFeild(
+                        clientNameController, 'Client Name'),
+                    buildInspectionTextFormFeild(
+                        carNumberController, 'Car Number'),
+                    buildInspectionTextFormFeild(
+                        clientContactController, 'Client Contact'),
+                    buildInspectionTextFormFeild(
+                        overallScoreController, 'Overall Score'),
+                    buildInspectionTextFormFeild(
+                        bodyScoreController, 'Body Score'),
+                    buildInspectionTextFormFeild(
+                        engineScoreController, 'Engine Score'),
+                    buildInspectionTextFormFeild(carMakeController, 'Car Make'),
+                    buildInspectionTextFormFeild(
+                        carModelController, 'Car Model'),
+                    buildInspectionTextFormFeild(
+                        carVarientController, 'Car Varient'),
+                    buildInspectionTextFormFeild(
+                        carRegistrationController, 'Car Registration'),
+                    buildInspectionTextFormFeild(
+                        engineNoController, 'Engine No.'),
+                    buildInspectionTextFormFeild(
+                        chasisNoController, 'Chasis No.'),
+                    buildInspectionTextFormFeild(
+                        carColorController, 'Car Color'),
+                    buildInspectionTextFormFeild(
+                        accidentedController, 'Accidented'),
+                    buildInspectionTextFormFeild(
+                        bodyTypeController, 'Body Type'),
+                    buildInspectionTextFormFeild(
+                        seatingCapacityController, 'Seating Capacity'),
+                    buildInspectionTextFormFeild(
+                        engineCapacityController, 'Engine Capacity'),
+                    buildInspectionTextFormFeild(milageController, 'Milage'),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

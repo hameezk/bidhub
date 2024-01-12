@@ -835,6 +835,37 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
                     comfortScoreController, 'Comfort Score'),
                 buildInspectionTextFormFeild(
                     inspectionDateController, 'Inspection Date'),
+                GestureDetector(
+                  onTap: () {
+                    buildInspectionDialog(propertyReport);
+                  },
+                  child: Container(
+                    height: 60,
+                    width: width(context) * 0.9,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: textColorLight.withOpacity(0.75),
+                    ),
+                    child: const Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'See All Details   ',
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: textColorDark),
+                          ),
+                          Icon(
+                            Icons.arrow_forward,
+                            color: textColorDark,
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           );
@@ -848,6 +879,137 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
             ],
           );
         }
+      },
+    );
+  }
+
+  buildInspectionDialog(PropertyReport propertyReport) {
+    final TextEditingController reportIdController = TextEditingController();
+    final TextEditingController inspectionTimeController =
+        TextEditingController();
+    final TextEditingController reportDateController = TextEditingController();
+    final TextEditingController agentNameController = TextEditingController();
+    final TextEditingController agentContactController =
+        TextEditingController();
+    final TextEditingController clientNameController = TextEditingController();
+    final TextEditingController clientAddressController =
+        TextEditingController();
+    final TextEditingController clientContactController =
+        TextEditingController();
+    final TextEditingController houseFacingController = TextEditingController();
+    final TextEditingController houseAgeController = TextEditingController();
+    final TextEditingController streetTypeController = TextEditingController();
+    final TextEditingController houseTypeController = TextEditingController();
+    final TextEditingController waterSourceController = TextEditingController();
+    final TextEditingController sewageSourceController =
+        TextEditingController();
+    final TextEditingController noOfStoriesController = TextEditingController();
+    final TextEditingController spaceBelowGradeController =
+        TextEditingController();
+    final TextEditingController garageController = TextEditingController();
+    final TextEditingController utilityStatusController =
+        TextEditingController();
+    final TextEditingController occoupancyController = TextEditingController();
+    final TextEditingController peoplePresentController =
+        TextEditingController();
+
+    reportIdController.text = propertyReport.reportId ?? '';
+    reportDateController.text = propertyReport.reportDate ?? '';
+    inspectionDateController.text = propertyReport.inspectionDate ?? '';
+    inspectionTimeController.text = propertyReport.inspectionTime ?? '';
+    agentNameController.text = propertyReport.agentName ?? '';
+    agentContactController.text = propertyReport.agentContact ?? '';
+    clientNameController.text = propertyReport.clientName ?? '';
+    clientContactController.text = propertyReport.clientContact ?? '';
+    clientAddressController.text = propertyReport.clientAddress ?? '';
+    overallScoreController.text = propertyReport.overallScore ?? '';
+    locationController.text = propertyReport.locationScore ?? '';
+    comfortScoreController.text = propertyReport.confortScore ?? '';
+    houseFacingController.text = propertyReport.houseFacing ?? '';
+    houseAgeController.text = propertyReport.houseAge ?? '';
+    streetTypeController.text = propertyReport.streetType ?? '';
+    houseTypeController.text = propertyReport.houseType ?? '';
+    waterSourceController.text = propertyReport.waterSource ?? '';
+    sewageSourceController.text = propertyReport.sewageSource ?? '';
+    noOfStoriesController.text = propertyReport.noOfStories ?? '';
+    spaceBelowGradeController.text = propertyReport.spaceBelowGrade ?? '';
+    garageController.text = propertyReport.garage ?? '';
+    utilityStatusController.text = propertyReport.utilityStatus ?? '';
+    occoupancyController.text = propertyReport.occoupancy ?? '';
+    peoplePresentController.text = propertyReport.peoplePresent ?? '';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          elevation: 1,
+          backgroundColor: Colors.white,
+          title: const Text(
+            "Car Inspection Report",
+            style: TextStyle(
+              color: textColorDark,
+            ),
+          ),
+          content: SizedBox(
+            height: height(context) * 0.7,
+            width: width(context) * 0.7,
+            child: SingleChildScrollView(
+              child: Form(
+                child: Column(
+                  children: [
+                    buildInspectionTextFormFeild(
+                        reportIdController, 'Report Id'),
+                    buildInspectionTextFormFeild(
+                        reportDateController, 'Report Date'),
+                    buildInspectionTextFormFeild(
+                        inspectionDateController, 'Inspection Date'),
+                    buildInspectionTextFormFeild(
+                        inspectionTimeController, 'Inspection Time'),
+                    buildInspectionTextFormFeild(
+                        agentNameController, 'Agent Name'),
+                    buildInspectionTextFormFeild(
+                        agentContactController, 'Agent Contact'),
+                    buildInspectionTextFormFeild(
+                        clientNameController, 'Client Name'),
+                    buildInspectionTextFormFeild(
+                        clientAddressController, 'Client Address'),
+                    buildInspectionTextFormFeild(
+                        clientContactController, 'Client Contact'),
+                    buildInspectionTextFormFeild(
+                        overallScoreController, 'Overall Score'),
+                    buildInspectionTextFormFeild(
+                        locationScoreController, 'Location Score'),
+                    buildInspectionTextFormFeild(
+                        comfortScoreController, 'Comfort Score'),
+                    buildInspectionTextFormFeild(
+                        houseFacingController, 'House Facing'),
+                    buildInspectionTextFormFeild(
+                        houseAgeController, 'House Age'),
+                    buildInspectionTextFormFeild(
+                        streetTypeController, 'Street Type'),
+                    buildInspectionTextFormFeild(
+                        houseTypeController, 'House Type'),
+                    buildInspectionTextFormFeild(
+                        waterSourceController, 'Water Source'),
+                    buildInspectionTextFormFeild(
+                        sewageSourceController, 'Sewage Source'),
+                    buildInspectionTextFormFeild(
+                        noOfStoriesController, 'No. Of Stories'),
+                    buildInspectionTextFormFeild(
+                        spaceBelowGradeController, 'Space Below Grade'),
+                    buildInspectionTextFormFeild(garageController, 'garage'),
+                    buildInspectionTextFormFeild(
+                        utilityStatusController, 'Utility Status'),
+                    buildInspectionTextFormFeild(
+                        occoupancyController, 'occoupancy'),
+                    buildInspectionTextFormFeild(
+                        peoplePresentController, 'People Present'),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
       },
     );
   }
