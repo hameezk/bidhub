@@ -17,8 +17,8 @@ import 'auction_details.dart';
 
 class UserProfileSeller extends StatefulWidget {
   const UserProfileSeller({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _UserProfileSellerState createState() => _UserProfileSellerState();

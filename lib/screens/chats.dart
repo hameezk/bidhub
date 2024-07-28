@@ -10,8 +10,8 @@ import 'chat_page.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   ChatPageState createState() => ChatPageState();

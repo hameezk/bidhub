@@ -13,8 +13,8 @@ import 'login_page.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _SignupPageState createState() => _SignupPageState();

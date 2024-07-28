@@ -15,9 +15,9 @@ class EditProfile extends StatefulWidget {
   final UserModel newUserModel;
 
   const EditProfile({
-    Key? key,
+    super.key,
     required this.newUserModel,
-  }) : super(key: key);
+  });
 
   @override
   _EditProfileState createState() => _EditProfileState();

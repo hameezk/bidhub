@@ -17,9 +17,9 @@ class CompleteProfile extends StatefulWidget {
   final UserModel newUserModel;
 
   const CompleteProfile({
-    Key? key,
+    super.key,
     required this.newUserModel,
-  }) : super(key: key);
+  });
 
   @override
   _CompleteProfileState createState() => _CompleteProfileState();

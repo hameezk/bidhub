@@ -22,11 +22,11 @@ class ChatRoom extends StatefulWidget {
   final UserModel userModel;
 
   const ChatRoom({
-    Key? key,
+    super.key,
     required this.targetUser,
     required this.chatRoom,
     required this.userModel,
-  }) : super(key: key);
+  });
 
   @override
   ChatRoomState createState() => ChatRoomState();

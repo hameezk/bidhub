@@ -106,7 +106,7 @@ class _ShowAllCarBidsState extends State<ShowAllCarBids> {
                               color: containerColor,
                               size: 30,
                             )
-                          : Container(
+                          : const SizedBox(
                               height: 0,
                               width: 0,
                             ),
@@ -118,4 +118,3 @@ class _ShowAllCarBidsState extends State<ShowAllCarBids> {
           );
   }
 }
-
