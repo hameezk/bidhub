@@ -481,7 +481,6 @@ class _HomeScreenState extends State<HomeScreenSeller> {
           if (snapshot.connectionState == ConnectionState.active) {
             if (snapshot.hasData) {
               QuerySnapshot dataSnapshot = snapshot.data as QuerySnapshot;
-
               if (dataSnapshot.docs.isNotEmpty) {
                 return ListView.builder(
                     padding: EdgeInsets.zero,
@@ -505,7 +504,7 @@ class _HomeScreenState extends State<HomeScreenSeller> {
                     });
               } else {
                 return const Text(
-                  "No results found!c12",
+                  "No results found!",
                   style: TextStyle(
                     color: Colors.blueGrey,
                   ),
@@ -520,7 +519,7 @@ class _HomeScreenState extends State<HomeScreenSeller> {
               );
             } else {
               return const Text(
-                "No results found!c2",
+                "No results found!",
                 style: TextStyle(
                   color: Colors.blueGrey,
                 ),

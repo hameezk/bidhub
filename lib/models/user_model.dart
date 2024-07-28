@@ -40,10 +40,10 @@ class UserModel {
       "recentBids": recentBids,
       "role": role,
       "savedBids": savedBids,
-
     };
   }
 
   static UserModel? loggedinUser;
-  static String defaultImage = '';
+  static String defaultImage =
+      'https://th.bing.com/th/id/R.ff49e3f95086a5354150f6587f450760?rik=ZLkvQ%2bNSitShtw&pid=ImgRaw&r=0';
 }

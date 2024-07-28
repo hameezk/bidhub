@@ -7,6 +7,7 @@ import 'package:bidhub/config/theme.dart';
 import 'package:bidhub/models/auction_model.dart';
 import 'package:bidhub/models/user_model.dart';
 import 'package:bidhub/screens/bidding_page.dart';
+import 'package:bidhub/screens/bids_show.dart';
 import 'package:bidhub/screens/home_screen_seller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -280,6 +281,29 @@ class _AuctionDetailsState extends State<AuctionDetails> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 10.0),
+                      (widget.auctionModel.ownerId ==
+                              UserModel.loggedinUser!.id)
+                          ? ElevatedButton(
+                              style: const ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStatePropertyAll(containerColor)),
+                              onPressed: () {
+                                withdrawAuction();
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  (widget.auctionModel.ownerId ==
+                                          UserModel.loggedinUser!.id)
+                                      ? 'Withdraw Auction'
+                                      : 'Go to Bids',
+                                  style: myTheme.textTheme.displaySmall!
+                                      .copyWith(color: textColorLight),
+                                ),
+                              ),
+                            )
+                          : Container(),
                       const SizedBox(height: 16.0),
                       ElevatedButton(
                         style: const ButtonStyle(
@@ -287,7 +311,11 @@ class _AuctionDetailsState extends State<AuctionDetails> {
                                 MaterialStatePropertyAll(containerColor)),
                         onPressed: () {
                           if (UserModel.loggedinUser!.role == 'Seller') {
-                            withdrawAuction();
+                            navigate(
+                                context,
+                                ShowAllCarBids(
+                                  auctionModel: widget.auctionModel,
+                                ));
                           } else {
                             if (DateTime.parse(
                                         widget.auctionModel.startDate ?? '')
@@ -317,9 +345,7 @@ class _AuctionDetailsState extends State<AuctionDetails> {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            (UserModel.loggedinUser!.role == 'Seller')
-                                ? 'Withdraw Auction'
-                                : 'Go to Bids',
+                            'Go to Bids',
                             style: myTheme.textTheme.displaySmall!
                                 .copyWith(color: textColorLight),
                           ),

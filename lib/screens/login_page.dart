@@ -109,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                   TextField(
                     controller: emailController,
                     decoration: const InputDecoration(
-                      labelText: "Email Address",
+                      labelText: "Email Address *",
                       hintText: "Enter Email... ",
                     ),
                   ),
@@ -117,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
                     controller: passwordController,
                     obscureText: true,
                     decoration: const InputDecoration(
-                      labelText: "Password",
+                      labelText: "Password *",
                       hintText: "Enter Password... ",
                     ),
                   ),

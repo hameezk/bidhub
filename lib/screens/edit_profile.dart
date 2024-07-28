@@ -45,7 +45,7 @@ class _EditProfileState extends State<EditProfile> {
         backgroundColor: Theme.of(context).canvasColor,
         centerTitle: true,
         title: const Text(
-          "Complete Profile",
+          "Edit Profile",
         ),
       ),
       body: SingleChildScrollView(
@@ -192,19 +192,21 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   void uploadData() async {
-    UploadTask uploadTask = FirebaseStorage.instance
-        .ref("profilepictures")
-        .child(widget.newUserModel.id.toString())
-        .putFile(imageFile!);
+    if (imageFile != null) {
+      UploadTask uploadTask = FirebaseStorage.instance
+          .ref("profilepictures")
+          .child(widget.newUserModel.id.toString())
+          .putFile(imageFile!);
 
-    TaskSnapshot snapshot = await uploadTask;
+      TaskSnapshot snapshot = await uploadTask;
 
-    String imageUrl = await snapshot.ref.getDownloadURL();
+      String imageUrl = await snapshot.ref.getDownloadURL();
+      widget.newUserModel.image = imageUrl;
+    }
     String fullname = fullNameController.text.trim();
     String phone = phoneController.text.trim();
 
     widget.newUserModel.name = fullname;
-    widget.newUserModel.image = imageUrl;
     widget.newUserModel.phoneno = phone;
 
     await FirebaseFirestore.instance

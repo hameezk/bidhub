@@ -108,6 +108,7 @@ class _ShowAllCarBidsState extends State<ShowAllCarBids> {
                             )
                           : Container(
                               height: 0,
+                              width: 0,
                             ),
                     ),
                   ),

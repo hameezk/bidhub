@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
+import 'package:bidhub/config/colors.dart';
 import 'package:bidhub/config/loading_dialoge.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,7 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   List<String> roles = ["Customer", "Seller"];
-  String? role;
+  String? role = 'Customer';
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -141,19 +142,25 @@ class _SignupPageState extends State<SignupPage> {
                   const SizedBox(
                     height: 20,
                   ),
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          isExpanded: true,
-                          hint: const Text("Signup for:"),
-                          value: role,
-                          items: roles.map(buildMenuItem).toList(),
-                          onChanged: (value) => setState(
-                            () {
-                              role = value;
-                            },
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: lightBlack),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            isExpanded: true,
+                            hint: const Text("Signup for:"),
+                            value: role,
+                            items: roles.map(buildMenuItem).toList(),
+                            onChanged: (value) => setState(
+                              () {
+                                role = value;
+                              },
+                            ),
                           ),
                         ),
                       ),
@@ -165,7 +172,7 @@ class _SignupPageState extends State<SignupPage> {
                   TextField(
                     controller: emailController,
                     decoration: const InputDecoration(
-                      labelText: "Email Address",
+                      labelText: "Email Address *",
                       hintText: "Enter Email... ",
                     ),
                   ),
@@ -173,7 +180,7 @@ class _SignupPageState extends State<SignupPage> {
                     controller: passwordController,
                     obscureText: true,
                     decoration: const InputDecoration(
-                      labelText: "Password",
+                      labelText: "Password *",
                       hintText: "Enter Password... ",
                     ),
                   ),
@@ -181,7 +188,7 @@ class _SignupPageState extends State<SignupPage> {
                     controller: cPasswordController,
                     obscureText: true,
                     decoration: const InputDecoration(
-                      labelText: "Confirm Password",
+                      labelText: "Confirm Password *",
                       hintText: "Confirm Password... ",
                     ),
                   ),

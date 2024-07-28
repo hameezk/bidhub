@@ -296,39 +296,41 @@ class _AddAuctionState extends State<AddAuction> {
                           },
                         ),
                       ),
-                      buildTextFormFeild(nameController, 'Car Name',
+                      buildTextFormFeild(nameController, 'Car Name *',
                           'Please enter the car name'),
                       buildTextFormFeild(
                           descriptionController,
-                          'Car description',
+                          'Car description *',
                           'Please enter the car description'),
-                      buildTextFormFeild(categoryController, 'Car category',
+                      buildTextFormFeild(categoryController, 'Car category *',
                           'Please enter the car category'),
-                      buildTextFormFeild(makeController, 'Car make',
+                      buildTextFormFeild(makeController, 'Car make *',
                           'Please enter the car make'),
-                      buildTextFormFeild(modelController, 'Car Model',
+                      buildTextFormFeild(modelController, 'Car Model *',
                           'Please enter the car model'),
-                      buildTextFormFeild(milageController, 'Car Milage',
+                      buildTextFormFeild(milageController, 'Car Milage *',
                           'Please enter the car milage'),
-                      buildTextFormFeild(enginetypeController, 'Engine Type',
+                      buildTextFormFeild(enginetypeController, 'Engine Type *',
                           'Please enter the engine type'),
                       buildTextFormFeild(
                           transmissionTypeController,
-                          'Transmission Type',
+                          'Transmission Type *',
                           'Please enter the Transmission Type'),
-                      buildTextFormFeild(regsteredInController, 'Registration',
-                          'Please enter the registration'),
-                      buildTextFormFeild(colorController, 'Car Color',
+                      buildTextFormFeild(regsteredInController,
+                          'Registration *', 'Please enter the registration'),
+                      buildTextFormFeild(colorController, 'Car Color *',
                           'Please enter the car color'),
                       buildTextFormFeild(
                           engineCapacityController,
-                          'Engine Capacity',
-                          'Please enter the Engine Capacity'),
-                      buildTextFormFeild(bodytypeController, 'Body Type',
+                          'Engine Capacity *',
+                          'Please enter the Engine Capacity *'),
+                      buildTextFormFeild(bodytypeController, 'Body Type *',
                           'Please enter the body type'),
-                      buildTextFormFeild(locationController, 'Car location',
+                      buildTextFormFeild(locationController, 'Car location *',
                           'Please enter the car location'),
-                      buildTextFormFeild(startingBidController, 'Starting Bid',
+                      buildTextFormFeild(
+                          startingBidController,
+                          'Starting Bid *',
                           'Please enter the car starting bid'),
                       const SizedBox(height: 50.0),
                       GridView.builder(
@@ -522,6 +524,7 @@ class _AddAuctionState extends State<AddAuction> {
 
   Future<void> selectStartTime(BuildContext context) async {
     picked = await showTimePicker(
+      helpText: 'Select Start Time',
       context: context,
       initialTime: const TimeOfDay(hour: 00, minute: 00),
     );
@@ -535,6 +538,7 @@ class _AddAuctionState extends State<AddAuction> {
 
   Future<void> selectEndTime(BuildContext context) async {
     picked = await showTimePicker(
+      helpText: 'Select End Time',
       context: context,
       initialTime: const TimeOfDay(hour: 00, minute: 00),
     );
