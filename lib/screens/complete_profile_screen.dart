@@ -100,12 +100,20 @@ class _CompleteProfileState extends State<CompleteProfile> {
     String fullName = fullNameController.text.trim();
     String idDesg = phoneController.text.trim();
 
-    if (fullName.isEmpty || imageFile == override || idDesg.isEmpty) {
+    if (fullName.isEmpty || idDesg.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: Colors.blueGrey,
           duration: Duration(seconds: 1),
           content: Text("Please fill all the fields!"),
+        ),
+      );
+    } else if (imageFile == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.blueGrey,
+          duration: Duration(seconds: 1),
+          content: Text("Please upload an image!"),
         ),
       );
     } else {
