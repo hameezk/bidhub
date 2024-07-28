@@ -84,7 +84,27 @@ class ChatPageState extends State<ChatPage> {
                                         targetUser.image.toString()),
                                     child: const CircularProgressIndicator(),
                                   ),
-                                  title: Text(targetUser.name.toString()),
+                                  title: Row(
+                                    children: [
+                                      Text(
+                                        targetUser.name.toString(),
+                                        style: const TextStyle(
+                                            color: textColorDark,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      (targetUser.id ==
+                                              'tBuAzA90NffCXIyfMiKR0Nw3RHc2')
+                                          ? SizedBox(
+                                              height: 20,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 4.0),
+                                                child: Image.asset(
+                                                    'assets/verify.png'),
+                                              ))
+                                          : const Text('')
+                                    ],
+                                  ),
                                   subtitle: (chatRoomModel.lastMessage
                                               .toString() !=
                                           "")

@@ -1,22 +1,22 @@
 import 'package:bidhub/config/colors.dart';
 import 'package:bidhub/config/size.dart';
 import 'package:bidhub/config/theme.dart';
-import 'package:bidhub/models/auction_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
+import '../models/property_model.dart';
 import '../models/user_model.dart';
 
-class ShowAllCarBids extends StatefulWidget {
-  final AuctionModel auctionModel;
-  const ShowAllCarBids({super.key, required this.auctionModel});
+class ShowAllPropertyBids extends StatefulWidget {
+  final PropertyModel propertyModel;
+  const ShowAllPropertyBids({super.key, required this.propertyModel});
 
   @override
-  State<ShowAllCarBids> createState() => _ShowAllCarBidsState();
+  State<ShowAllPropertyBids> createState() => _ShowAllPropertyBidsState();
 }
 
-class _ShowAllCarBidsState extends State<ShowAllCarBids> {
+class _ShowAllPropertyBidsState extends State<ShowAllPropertyBids> {
   Uuid uuid = const Uuid();
   @override
   Widget build(BuildContext context) {
@@ -31,8 +31,8 @@ class _ShowAllCarBidsState extends State<ShowAllCarBids> {
             width: width(context),
             child: StreamBuilder(
                 stream: FirebaseFirestore.instance
-                    .collection("auction")
-                    .where("id", isEqualTo: widget.auctionModel.id)
+                    .collection("properties")
+                    .where("id", isEqualTo: widget.propertyModel.id)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.active) {
@@ -41,9 +41,9 @@ class _ShowAllCarBidsState extends State<ShowAllCarBids> {
                           snapshot.data as QuerySnapshot;
                       Map<String, dynamic> auctionMap =
                           dataSnapshot.docs[0].data() as Map<String, dynamic>;
-                      AuctionModel auctionModel =
-                          AuctionModel.fromMap(auctionMap);
-                      return buildBiddsList(context, auctionModel);
+                      PropertyModel propertyModel =
+                          PropertyModel.fromMap(auctionMap);
+                      return buildBiddsList(context, propertyModel);
                     } else {
                       return const Center(child: Text('No bids to show...'));
                     }
@@ -57,16 +57,16 @@ class _ShowAllCarBidsState extends State<ShowAllCarBids> {
     );
   }
 
-  buildBiddsList(BuildContext context, AuctionModel auctionModel) {
-    return (auctionModel.bids!.isEmpty)
+  buildBiddsList(BuildContext context, PropertyModel propertyModel) {
+    return (propertyModel.bids!.isEmpty)
         ? const Center(
             child: Text('No bids to show...'),
           )
         : ListView.builder(
             shrinkWrap: true,
-            itemCount: auctionModel.bids!.length,
+            itemCount: propertyModel.bids!.length,
             itemBuilder: (context, index) {
-              List orderedBids = auctionModel.bids!.reversed.toList();
+              List orderedBids = propertyModel.bids!.reversed.toList();
               Map bids = orderedBids[index];
               return Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -108,7 +108,6 @@ class _ShowAllCarBidsState extends State<ShowAllCarBids> {
                             )
                           : Container(
                               height: 0,
-                              width: 0,
                             ),
                     ),
                   ),
@@ -118,4 +117,3 @@ class _ShowAllCarBidsState extends State<ShowAllCarBids> {
           );
   }
 }
-

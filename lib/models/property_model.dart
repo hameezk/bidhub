@@ -19,6 +19,7 @@ class PropertyModel {
   List? bids;
   bool? isActive;
   String? winingBid;
+  String? inspectionReport;
 
   PropertyModel({
     required this.id,
@@ -38,6 +39,7 @@ class PropertyModel {
     required this.bids,
     required this.isActive,
     required this.winingBid,
+    required this.inspectionReport,
   });
 
   PropertyModel.fromMap(Map<String, dynamic> map) {
@@ -58,6 +60,7 @@ class PropertyModel {
     bids = map["bids"];
     isActive = map["isActive"];
     winingBid = map["winingBid"];
+    inspectionReport = map["inspectionReport"];
   }
 
   Map<String, dynamic> toMap() {
@@ -79,6 +82,7 @@ class PropertyModel {
       "bids": bids,
       "isActive": isActive,
       "winingBid": winingBid,
+      "inspectionReport": inspectionReport,
     };
   }
 
@@ -145,9 +149,9 @@ class PropertyModel {
           'Malir cantt Askari 5,  Scetor J, Brigadier House for sale, 5 Bedrooms',
       ownerId: 'VfyKUQ2pBlMwPzGlmkSLz8dWJYB3',
       bedrooms: '2',
-      startDate: (DateTime.now().add(const Duration(days: 1))).toString(),
+      startDate: (DateTime.now().add(const Duration(days: 30))).toString(),
       endDate:
-          (DateTime.now().add(const Duration(days: 1, hours: 5))).toString(),
+          (DateTime.now().add(const Duration(days: 30, hours: 5))).toString(),
       location:
           'Askari 5 - Sector J, Askari 5, Malir Cantonment, Cantt, Karachi, Sindh',
       startingBid: '60000000',
@@ -157,6 +161,7 @@ class PropertyModel {
       bids: [],
       isActive: true,
       winingBid: '',
+      inspectionReport:'',
     ),
     PropertyModel(
       id: '3',
@@ -173,9 +178,9 @@ class PropertyModel {
           'Bahria Town - Precinct 10-B House For Sale Sized 152 Square Yards',
       ownerId: 'VfyKUQ2pBlMwPzGlmkSLz8dWJYB3',
       bedrooms: '2',
-      startDate: (DateTime.now().add(const Duration(days: 1))).toString(),
+      startDate: (DateTime.now().add(const Duration(days: 30))).toString(),
       endDate:
-          (DateTime.now().add(const Duration(days: 1, hours: 5))).toString(),
+          (DateTime.now().add(const Duration(days: 30, hours: 5))).toString(),
       location:
           'Askari 5 - Sector J, Askari 5, Malir Cantonment, Cantt, Karachi, Sindh',
       startingBid: '60000000',
@@ -184,6 +189,7 @@ class PropertyModel {
       features: demoFeatures,
       bids: [],
       isActive: true,
+      inspectionReport:'',
       winingBid: '',
     ),
     PropertyModel(
@@ -201,9 +207,9 @@ class PropertyModel {
           'Gulistan-e-Jauhar - Block 15, Gulistan-e-Jauhar, Karachi, Sindh',
       ownerId: 'VfyKUQ2pBlMwPzGlmkSLz8dWJYB3',
       bedrooms: '2',
-      startDate: (DateTime.now().add(const Duration(days: 1))).toString(),
+      startDate: (DateTime.now().add(const Duration(days: 30))).toString(),
       endDate:
-          (DateTime.now().add(const Duration(days: 1, hours: 5))).toString(),
+          (DateTime.now().add(const Duration(days: 30, hours: 5))).toString(),
       location:
           'Askari 5 - Sector J, Askari 5, Malir Cantonment, Cantt, Karachi, Sindh',
       startingBid: '60000000',
@@ -212,6 +218,7 @@ class PropertyModel {
       features: demoFeatures,
       bids: [],
       isActive: true,
+      inspectionReport:'',
       winingBid: '',
     ),
   ];

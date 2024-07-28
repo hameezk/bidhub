@@ -1,9 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'package:bidhub/config/bottombar.dart';
 import 'package:bidhub/config/loading_dialoge.dart';
 import 'package:bidhub/config/size.dart';
 import 'package:bidhub/config/snackbar.dart';
 import 'package:bidhub/config/theme.dart';
+import 'package:bidhub/models/inspection_report_property.dart';
 import 'package:bidhub/models/user_model.dart';
 import 'package:bidhub/screens/add_car_auction.dart';
 import 'package:bidhub/screens/home_screen_seller.dart';
@@ -11,6 +14,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
@@ -38,6 +42,11 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
   TextEditingController startingDateController = TextEditingController();
   TextEditingController endDateController = TextEditingController();
   TextEditingController noneController = TextEditingController();
+  final TextEditingController overallScoreController = TextEditingController();
+  final TextEditingController locationScoreController = TextEditingController();
+  final TextEditingController comfortScoreController = TextEditingController();
+  final TextEditingController inspectionDateController =
+      TextEditingController();
   List<File> images = [];
   List<String> imageLinks = [];
   DateTime? biddingDate;
@@ -46,6 +55,7 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
   DateTime? endTime;
   TimeOfDay? picked = TimeOfDay.now();
   Uuid uuid = const Uuid();
+  File? imageFile;
   List features = [
     {
       'feature': 'Built in year',
@@ -354,6 +364,80 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
                       const SizedBox(height: 50.0),
                       GestureDetector(
                         onTap: () {
+                          showInspectionOptions();
+                        },
+                        onLongPress: () {
+                          if (imageFile != null) {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  elevation: 1,
+                                  backgroundColor: Colors.white,
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        height: height(context) * 0.7,
+                                        width: width(context) * 0.7,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          image: DecorationImage(
+                                            image: FileImage(imageFile!),
+                                            fit: BoxFit.fitWidth,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: textColorLight.withOpacity(0.7)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(24.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Padding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 8.0),
+                                  child: Icon(
+                                    Icons.featured_play_list_outlined,
+                                    color: textColorDark,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: width(context) * 0.6,
+                                  child: Text(
+                                    (imageFile != null)
+                                        ? imageFile!.path.split('/').last
+                                        : 'Upload Inspection Report',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: myTheme.textTheme.displaySmall!
+                                        .copyWith(color: textColorDark),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 30.0),
+                      (imageFile != null)
+                          ? buildInspectionReportForm()
+                          : Container(
+                              height: 0,
+                            ),
+                      const SizedBox(height: 30.0),
+                      GestureDetector(
+                        onTap: () {
                           datePicker();
                         },
                         child: Row(
@@ -527,6 +611,18 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
     );
   }
 
+  TextFormField buildInspectionTextFormFeild(
+      TextEditingController controller, String label) {
+    return TextFormField(
+      controller: controller,
+      readOnly: true,
+      decoration: InputDecoration(
+        labelText: label,
+        border: InputBorder.none,
+      ),
+    );
+  }
+
   void selectImage(ImageSource source) async {
     XFile? selectedImage = await ImagePicker().pickImage(source: source);
     if (selectedImage != null) {
@@ -588,13 +684,20 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
     showLoadingDialog(context, 'Uploading data...');
     for (var image in images) {
       UploadTask uploadTask = FirebaseStorage.instance
-          .ref("carPictures")
+          .ref("PropertyPictures")
           .child(image.path)
           .putFile(image);
       TaskSnapshot snapshot = await uploadTask;
       String imageUrl = await snapshot.ref.getDownloadURL();
       imageLinks.add(imageUrl);
     }
+
+    UploadTask uploadTask = FirebaseStorage.instance
+        .ref("inspectionReports")
+        .child(imageFile!.path)
+        .putFile(imageFile!);
+    TaskSnapshot snapshot = await uploadTask;
+    String reportUrl = await snapshot.ref.getDownloadURL();
 
     PropertyModel propertyModel = PropertyModel(
       id: uuid.v1(),
@@ -610,14 +713,15 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
       bids: [],
       isActive: true,
       winingBid: '',
-      area: '',
-      baths: '',
-      bedrooms: '',
-      type: '',
+      area: areaController.text.trim(),
+      baths: bathsController.text.trim(),
+      bedrooms: bedroomController.text.trim(),
+      type: typeController.text.trim(),
+      inspectionReport: reportUrl,
     );
 
     await FirebaseFirestore.instance
-        .collection("auction")
+        .collection("properties")
         .doc(propertyModel.id)
         .set(propertyModel.toMap())
         .then(
@@ -636,6 +740,276 @@ class _AddAuctionPropertyState extends State<AddAuctionProperty> {
             builder: (context) {
               return const HomeScreenSeller();
             },
+          ),
+        );
+      },
+    );
+  }
+
+  void showInspectionOptions() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text(
+            "Upload Inspection Report",
+            style: TextStyle(
+              color: Colors.blueGrey,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                onTap: () {
+                  Navigator.pop(context);
+                  pickInspectionReport(ImageSource.gallery);
+                },
+                leading: const Icon(Icons.photo_album_rounded),
+                title: const Text(
+                  "Select from Gallery",
+                  style: TextStyle(
+                    color: Colors.blueGrey,
+                  ),
+                ),
+              ),
+              ListTile(
+                onTap: () {
+                  Navigator.pop(context);
+                  pickInspectionReport(ImageSource.camera);
+                },
+                leading: const Icon(CupertinoIcons.photo_camera),
+                title: const Text(
+                  "Take new photo",
+                  style: TextStyle(
+                    color: Colors.blueGrey,
+                  ),
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<String> readTextFromImage() async {
+    final inputImage = InputImage.fromFile(imageFile!);
+    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+    final RecognizedText recognizedText =
+        await textRecognizer.processImage(inputImage);
+    String text = recognizedText.text;
+
+    textRecognizer.close();
+
+    return text;
+  }
+
+  Future<void> pickInspectionReport(ImageSource source) async {
+    XFile? selectedImage = await ImagePicker().pickImage(source: source);
+    if (selectedImage != null) {
+      setState(() {
+        imageFile = File(selectedImage.path);
+      });
+    }
+  }
+
+  buildInspectionReportForm() {
+    return FutureBuilder(
+      future: readTextFromImage(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          PropertyReport propertyReport =
+              PropertyReport.parseInspectionReport(snapshot.data!);
+          overallScoreController.text = propertyReport.overallScore ?? "";
+          locationScoreController.text = propertyReport.locationScore ?? "";
+          comfortScoreController.text = propertyReport.confortScore ?? "";
+          inspectionDateController.text = propertyReport.inspectionDate ?? "";
+          return Form(
+            child: Column(
+              children: [
+                buildInspectionTextFormFeild(
+                    overallScoreController, 'Overall Score'),
+                buildInspectionTextFormFeild(
+                    locationScoreController, 'Location Score'),
+                buildInspectionTextFormFeild(
+                    comfortScoreController, 'Comfort Score'),
+                buildInspectionTextFormFeild(
+                    inspectionDateController, 'Inspection Date'),
+                GestureDetector(
+                  onTap: () {
+                    buildInspectionDialog(propertyReport);
+                  },
+                  child: Container(
+                    height: 60,
+                    width: width(context) * 0.9,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: textColorLight.withOpacity(0.75),
+                    ),
+                    child: const Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'See All Details   ',
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: textColorDark),
+                          ),
+                          Icon(
+                            Icons.arrow_forward,
+                            color: textColorDark,
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        } else {
+          return const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: containerColor,
+              ),
+            ],
+          );
+        }
+      },
+    );
+  }
+
+  buildInspectionDialog(PropertyReport propertyReport) {
+    final TextEditingController reportIdController = TextEditingController();
+    final TextEditingController inspectionTimeController =
+        TextEditingController();
+    final TextEditingController reportDateController = TextEditingController();
+    final TextEditingController agentNameController = TextEditingController();
+    final TextEditingController agentContactController =
+        TextEditingController();
+    final TextEditingController clientNameController = TextEditingController();
+    final TextEditingController clientAddressController =
+        TextEditingController();
+    final TextEditingController clientContactController =
+        TextEditingController();
+    final TextEditingController houseFacingController = TextEditingController();
+    final TextEditingController houseAgeController = TextEditingController();
+    final TextEditingController streetTypeController = TextEditingController();
+    final TextEditingController houseTypeController = TextEditingController();
+    final TextEditingController waterSourceController = TextEditingController();
+    final TextEditingController sewageSourceController =
+        TextEditingController();
+    final TextEditingController noOfStoriesController = TextEditingController();
+    final TextEditingController spaceBelowGradeController =
+        TextEditingController();
+    final TextEditingController garageController = TextEditingController();
+    final TextEditingController utilityStatusController =
+        TextEditingController();
+    final TextEditingController occoupancyController = TextEditingController();
+    final TextEditingController peoplePresentController =
+        TextEditingController();
+
+    reportIdController.text = propertyReport.reportId ?? '';
+    reportDateController.text = propertyReport.reportDate ?? '';
+    inspectionDateController.text = propertyReport.inspectionDate ?? '';
+    inspectionTimeController.text = propertyReport.inspectionTime ?? '';
+    agentNameController.text = propertyReport.agentName ?? '';
+    agentContactController.text = propertyReport.agentContact ?? '';
+    clientNameController.text = propertyReport.clientName ?? '';
+    clientContactController.text = propertyReport.clientContact ?? '';
+    clientAddressController.text = propertyReport.clientAddress ?? '';
+    overallScoreController.text = propertyReport.overallScore ?? '';
+    locationController.text = propertyReport.locationScore ?? '';
+    comfortScoreController.text = propertyReport.confortScore ?? '';
+    houseFacingController.text = propertyReport.houseFacing ?? '';
+    houseAgeController.text = propertyReport.houseAge ?? '';
+    streetTypeController.text = propertyReport.streetType ?? '';
+    houseTypeController.text = propertyReport.houseType ?? '';
+    waterSourceController.text = propertyReport.waterSource ?? '';
+    sewageSourceController.text = propertyReport.sewageSource ?? '';
+    noOfStoriesController.text = propertyReport.noOfStories ?? '';
+    spaceBelowGradeController.text = propertyReport.spaceBelowGrade ?? '';
+    garageController.text = propertyReport.garage ?? '';
+    utilityStatusController.text = propertyReport.utilityStatus ?? '';
+    occoupancyController.text = propertyReport.occoupancy ?? '';
+    peoplePresentController.text = propertyReport.peoplePresent ?? '';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          elevation: 1,
+          backgroundColor: Colors.white,
+          title: const Text(
+            "Car Inspection Report",
+            style: TextStyle(
+              color: textColorDark,
+            ),
+          ),
+          content: SizedBox(
+            height: height(context) * 0.7,
+            width: width(context) * 0.7,
+            child: SingleChildScrollView(
+              child: Form(
+                child: Column(
+                  children: [
+                    buildInspectionTextFormFeild(
+                        reportIdController, 'Report Id'),
+                    buildInspectionTextFormFeild(
+                        reportDateController, 'Report Date'),
+                    buildInspectionTextFormFeild(
+                        inspectionDateController, 'Inspection Date'),
+                    buildInspectionTextFormFeild(
+                        inspectionTimeController, 'Inspection Time'),
+                    buildInspectionTextFormFeild(
+                        agentNameController, 'Agent Name'),
+                    buildInspectionTextFormFeild(
+                        agentContactController, 'Agent Contact'),
+                    buildInspectionTextFormFeild(
+                        clientNameController, 'Client Name'),
+                    buildInspectionTextFormFeild(
+                        clientAddressController, 'Client Address'),
+                    buildInspectionTextFormFeild(
+                        clientContactController, 'Client Contact'),
+                    buildInspectionTextFormFeild(
+                        overallScoreController, 'Overall Score'),
+                    buildInspectionTextFormFeild(
+                        locationScoreController, 'Location Score'),
+                    buildInspectionTextFormFeild(
+                        comfortScoreController, 'Comfort Score'),
+                    buildInspectionTextFormFeild(
+                        houseFacingController, 'House Facing'),
+                    buildInspectionTextFormFeild(
+                        houseAgeController, 'House Age'),
+                    buildInspectionTextFormFeild(
+                        streetTypeController, 'Street Type'),
+                    buildInspectionTextFormFeild(
+                        houseTypeController, 'House Type'),
+                    buildInspectionTextFormFeild(
+                        waterSourceController, 'Water Source'),
+                    buildInspectionTextFormFeild(
+                        sewageSourceController, 'Sewage Source'),
+                    buildInspectionTextFormFeild(
+                        noOfStoriesController, 'No. Of Stories'),
+                    buildInspectionTextFormFeild(
+                        spaceBelowGradeController, 'Space Below Grade'),
+                    buildInspectionTextFormFeild(garageController, 'garage'),
+                    buildInspectionTextFormFeild(
+                        utilityStatusController, 'Utility Status'),
+                    buildInspectionTextFormFeild(
+                        occoupancyController, 'occoupancy'),
+                    buildInspectionTextFormFeild(
+                        peoplePresentController, 'People Present'),
+                  ],
+                ),
+              ),
+            ),
           ),
         );
       },

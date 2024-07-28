@@ -5,6 +5,7 @@ class MessageModel {
   bool? seen;
   String? createdon;
   String? auctionLink;
+  String? auctionType;
 
   MessageModel({
     this.messageId,
@@ -13,6 +14,7 @@ class MessageModel {
     this.seen,
     this.createdon,
     this.auctionLink,
+    this.auctionType,
   });
 
   MessageModel.fromMap(Map<String, dynamic> map) {
@@ -22,6 +24,7 @@ class MessageModel {
     seen = map["seen"];
     createdon = map["createdOn"];
     auctionLink = map["auctionLink"]??'';
+    auctionType = map["auctionType"]??'';
   }
 
   Map<String, dynamic> toMap() {
@@ -32,6 +35,7 @@ class MessageModel {
       "seen": seen,
       "createdOn": createdon,
       "auctionLink": auctionLink??'',
+      "auctionType": auctionType??'',
     };
   }
 }

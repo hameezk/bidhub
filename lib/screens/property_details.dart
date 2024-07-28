@@ -4,12 +4,14 @@ import 'package:bidhub/config/size.dart';
 import 'package:bidhub/config/snackbar.dart';
 import 'package:bidhub/config/theme.dart';
 import 'package:bidhub/models/user_model.dart';
+import 'package:bidhub/screens/bidding_page_property.dart';
 import 'package:bidhub/screens/home_screen_seller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import '../config/colors.dart';
+import '../config/navigate.dart';
 import '../models/property_model.dart';
 
 class PropertyDetails extends StatefulWidget {
@@ -87,9 +89,18 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                     Icons.bookmark_border_sharp,
                     color: textColorDark,
                   ))
-              : Container(
-                  height: 0,
-                ),
+              : (UserModel.loggedinUser!.role == 'Seller')
+                  ? IconButton(
+                      onPressed: () {
+                        withdrawAuction();
+                      },
+                      icon: const Icon(
+                        Icons.delete_forever_outlined,
+                        color: textColorDark,
+                      ))
+                  : Container(
+                      height: 0,
+                    ),
         ],
       ),
       extendBodyBehindAppBar: true,
@@ -253,40 +264,34 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                             backgroundColor:
                                 MaterialStatePropertyAll(containerColor)),
                         onPressed: () {
-                          if (UserModel.loggedinUser!.role == 'Seller') {
-                            withdrawAuction();
+                          if (DateTime.parse(
+                                      widget.propertyModel.startDate ?? '')
+                                  .isBefore(DateTime.now()) &&
+                              DateTime.parse(widget.propertyModel.endDate ?? '')
+                                  .isAfter(DateTime.now())) {
+                            navigate(
+                                context,
+                                BiddingPageProperty(
+                                    propertyModel: widget.propertyModel));
                           } else {
-                            if (DateTime.parse(
-                                        widget.propertyModel.startDate ?? '')
-                                    .isBefore(DateTime.now()) &&
-                                DateTime.parse(
-                                        widget.propertyModel.endDate ?? '')
-                                    .isAfter(DateTime.now())) {
-                              // navigate(
-                              //     context,
-                              //     BiddingPage(
-                              //         propertyModel: widget.propertyModel));
+                            if (DateTime.now().isBefore(DateTime.parse(
+                                widget.propertyModel.startDate ?? ''))) {
+                              showCustomSnackbar(
+                                  context: context,
+                                  content:
+                                      'Bidding event has not started yet!');
                             } else {
-                              if (DateTime.now().isBefore(DateTime.parse(
-                                  widget.propertyModel.startDate ?? ''))) {
-                                showCustomSnackbar(
-                                    context: context,
-                                    content:
-                                        'Bidding event has not started yet!');
-                              } else {
-                                showCustomSnackbar(
-                                    context: context,
-                                    content: 'Bidding event has been ended!');
-                              }
+                              navigate(
+                                  context,
+                                  BiddingPageProperty(
+                                      propertyModel: widget.propertyModel));
                             }
                           }
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            (UserModel.loggedinUser!.role == 'Seller')
-                                ? 'Withdraw Auction'
-                                : 'Go to Bids',
+                            'Go to Bids',
                             style: myTheme.textTheme.displaySmall!
                                 .copyWith(color: textColorLight),
                           ),
@@ -343,7 +348,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
   Future<void> withdrawAuction() async {
     showLoadingDialog(context, 'Withdrawing Auction');
     await FirebaseFirestore.instance
-        .collection("auction")
+        .collection("properties")
         .doc(widget.propertyModel.id)
         .delete()
         .then(

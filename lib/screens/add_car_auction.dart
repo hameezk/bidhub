@@ -5,6 +5,7 @@ import 'package:bidhub/config/size.dart';
 import 'package:bidhub/config/snackbar.dart';
 import 'package:bidhub/config/theme.dart';
 import 'package:bidhub/models/auction_model.dart';
+import 'package:bidhub/models/inspection_report_car.dart';
 import 'package:bidhub/models/user_model.dart';
 import 'package:bidhub/screens/add_property_auction.dart';
 import 'package:bidhub/screens/home_screen_seller.dart';
@@ -12,6 +13,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
@@ -46,6 +48,11 @@ class _AddAuctionState extends State<AddAuction> {
   final TextEditingController startingBidController = TextEditingController();
   final TextEditingController startingDateController = TextEditingController();
   final TextEditingController endDateController = TextEditingController();
+  final TextEditingController overallScoreController = TextEditingController();
+  final TextEditingController bodyScoreController = TextEditingController();
+  final TextEditingController engineScoreController = TextEditingController();
+  final TextEditingController inspectionDateController =
+      TextEditingController();
   List<File> images = [];
   List<String> imageLinks = [];
   DateTime? biddingDate;
@@ -53,6 +60,7 @@ class _AddAuctionState extends State<AddAuction> {
   DateTime? startTime;
   DateTime? endTime;
   TimeOfDay? picked = TimeOfDay.now();
+  File? imageFile;
   Uuid uuid = const Uuid();
   List features = [
     {
@@ -398,6 +406,80 @@ class _AddAuctionState extends State<AddAuction> {
                       const SizedBox(height: 50.0),
                       GestureDetector(
                         onTap: () {
+                          showInspectionOptions();
+                        },
+                        onLongPress: () {
+                          if (imageFile != null) {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  elevation: 1,
+                                  backgroundColor: Colors.white,
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        height: height(context) * 0.7,
+                                        width: width(context) * 0.7,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          image: DecorationImage(
+                                            image: FileImage(imageFile!),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: textColorLight.withOpacity(0.7)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(24.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Padding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 8.0),
+                                  child: Icon(
+                                    Icons.featured_play_list_outlined,
+                                    color: textColorDark,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: width(context) * 0.6,
+                                  child: Text(
+                                    (imageFile != null)
+                                        ? imageFile!.path.split('/').last
+                                        : 'Upload Inspection Report',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: myTheme.textTheme.displaySmall!
+                                        .copyWith(color: textColorDark),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 30.0),
+                      (imageFile != null)
+                          ? buildInspectionReportForm()
+                          : Container(
+                              height: 0,
+                            ),
+                      const SizedBox(height: 16.0),
+                      GestureDetector(
+                        onTap: () {
                           datePicker();
                         },
                         child: Row(
@@ -468,7 +550,8 @@ class _AddAuctionState extends State<AddAuction> {
                           if (_formKey.currentState!.validate()) {
                             if (images.isNotEmpty &&
                                 startTime != null &&
-                                endTime != null) {
+                                endTime != null &&
+                                imageFile != null) {
                               uploadData();
                             } else {
                               showCustomSnackbar(
@@ -630,6 +713,54 @@ class _AddAuctionState extends State<AddAuction> {
     );
   }
 
+  void showInspectionOptions() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text(
+            "Upload Inspection Report",
+            style: TextStyle(
+              color: Colors.blueGrey,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                onTap: () {
+                  Navigator.pop(context);
+                  pickInspectionReport(ImageSource.gallery);
+                },
+                leading: const Icon(Icons.photo_album_rounded),
+                title: const Text(
+                  "Select from Gallery",
+                  style: TextStyle(
+                    color: Colors.blueGrey,
+                  ),
+                ),
+              ),
+              ListTile(
+                onTap: () {
+                  Navigator.pop(context);
+                  pickInspectionReport(ImageSource.camera);
+                },
+                leading: const Icon(CupertinoIcons.photo_camera),
+                title: const Text(
+                  "Take new photo",
+                  style: TextStyle(
+                    color: Colors.blueGrey,
+                  ),
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void uploadData() async {
     showLoadingDialog(context, 'Uploading data...');
     for (var image in images) {
@@ -641,6 +772,13 @@ class _AddAuctionState extends State<AddAuction> {
       String imageUrl = await snapshot.ref.getDownloadURL();
       imageLinks.add(imageUrl);
     }
+
+    UploadTask uploadTask = FirebaseStorage.instance
+        .ref("inspectionReports")
+        .child(imageFile!.path)
+        .putFile(imageFile!);
+    TaskSnapshot snapshot = await uploadTask;
+    String reportUrl = await snapshot.ref.getDownloadURL();
 
     AuctionModel auctionModel = AuctionModel(
       id: uuid.v1(),
@@ -667,6 +805,7 @@ class _AddAuctionState extends State<AddAuction> {
       bids: [],
       isActive: true,
       winingBid: '',
+      inspectionReport: reportUrl,
     );
 
     await FirebaseFirestore.instance
@@ -689,6 +828,235 @@ class _AddAuctionState extends State<AddAuction> {
             builder: (context) {
               return const HomeScreenSeller();
             },
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> pickInspectionReport(ImageSource source) async {
+    XFile? selectedImage = await ImagePicker().pickImage(source: source);
+    if (selectedImage != null) {
+      setState(() {
+        imageFile = File(selectedImage.path);
+      });
+    }
+  }
+
+  Future<String> readTextFromImage() async {
+    final inputImage = InputImage.fromFile(imageFile!);
+    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+    final RecognizedText recognizedText =
+        await textRecognizer.processImage(inputImage);
+    String text = recognizedText.text;
+
+    textRecognizer.close();
+
+    return text;
+  }
+
+  buildInspectionReportForm() {
+    return FutureBuilder(
+      future: readTextFromImage(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          CarReport carReport = CarReport.parseInspectionReport(snapshot.data!);
+          overallScoreController.text = carReport.overallScore ?? "";
+          bodyScoreController.text = carReport.bodyScore ?? "";
+          engineScoreController.text = carReport.engineScore ?? "";
+          inspectionDateController.text = carReport.inspectionDate ?? "";
+          return Form(
+            child: Column(
+              children: [
+                buildInspectionTextFormFeild(
+                    overallScoreController, 'Overall Score'),
+                buildInspectionTextFormFeild(bodyScoreController, 'Body Score'),
+                buildInspectionTextFormFeild(
+                    engineScoreController, 'Engine Score'),
+                buildInspectionTextFormFeild(
+                    inspectionDateController, 'Inspection Date'),
+                GestureDetector(
+                  onTap: () {
+                    buildInspectionDialog(carReport);
+                  },
+                  child: Container(
+                    height: 60,
+                    width: width(context) * 0.9,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: textColorLight.withOpacity(0.75),
+                    ),
+                    child: const Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'See All Details   ',
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: textColorDark),
+                          ),
+                          Icon(
+                            Icons.arrow_forward,
+                            color: textColorDark,
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        } else {
+          return const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: containerColor,
+              ),
+            ],
+          );
+        }
+      },
+    );
+  }
+
+  TextFormField buildInspectionTextFormFeild(
+      TextEditingController controller, String label) {
+    return TextFormField(
+      controller: controller,
+      readOnly: true,
+      decoration: InputDecoration(
+        labelText: label,
+        border: InputBorder.none,
+      ),
+    );
+  }
+
+  buildInspectionDialog(CarReport carReport) {
+    final TextEditingController reportIdController = TextEditingController();
+    final TextEditingController inspectionTimeController =
+        TextEditingController();
+    final TextEditingController reportDateController = TextEditingController();
+    final TextEditingController agentNameController = TextEditingController();
+    final TextEditingController agentContactController =
+        TextEditingController();
+    final TextEditingController clientNameController = TextEditingController();
+    final TextEditingController carNumberController = TextEditingController();
+    final TextEditingController clientContactController =
+        TextEditingController();
+    final TextEditingController carMakeController = TextEditingController();
+    final TextEditingController carModelController = TextEditingController();
+    final TextEditingController carVarientController = TextEditingController();
+    final TextEditingController carRegistrationController =
+        TextEditingController();
+    final TextEditingController engineNoController = TextEditingController();
+    final TextEditingController chasisNoController = TextEditingController();
+    final TextEditingController carColorController = TextEditingController();
+    final TextEditingController accidentedController = TextEditingController();
+    final TextEditingController bodyTypeController = TextEditingController();
+    final TextEditingController seatingCapacityController =
+        TextEditingController();
+    final TextEditingController engineCapacityController =
+        TextEditingController();
+    final TextEditingController milageController = TextEditingController();
+
+    reportIdController.text = carReport.reportId ?? '';
+    inspectionDateController.text = carReport.inspectionDate ?? '';
+    inspectionTimeController.text = carReport.inspectionTime ?? '';
+    agentNameController.text = carReport.agentName ?? '';
+    agentContactController.text = carReport.agentContact ?? '';
+    clientNameController.text = carReport.clientName ?? '';
+    clientContactController.text = carReport.clientContact ?? '';
+    carNumberController.text = carReport.carNumber ?? '';
+    overallScoreController.text = carReport.overallScore ?? '';
+    bodyScoreController.text = carReport.bodyScore ?? '';
+    engineScoreController.text = carReport.engineScore ?? '';
+    carMakeController.text = carReport.carMake ?? '';
+    carModelController.text = carReport.carModel ?? '';
+    carVarientController.text = carReport.carVarient ?? '';
+    carRegistrationController.text = carReport.carRegistration ?? '';
+    engineNoController.text = carReport.engineNo ?? '';
+    chasisNoController.text = carReport.chasisNo ?? '';
+    carColorController.text = carReport.carColor ?? '';
+    accidentedController.text = carReport.accidented ?? '';
+    bodyTypeController.text = carReport.bodyType ?? '';
+    seatingCapacityController.text = carReport.seatingCapacity ?? '';
+    engineCapacityController.text = carReport.engineCapacity ?? '';
+    milageController.text = carReport.milage ?? '';
+    reportDateController.text = carReport.reportDate ?? '';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          elevation: 1,
+          backgroundColor: Colors.white,
+          title: const Text(
+            "Car Inspection Report",
+            style: TextStyle(
+              color: textColorDark,
+            ),
+          ),
+          content: SizedBox(
+            height: height(context) * 0.7,
+            width: width(context) * 0.7,
+            child: SingleChildScrollView(
+              child: Form(
+                child: Column(
+                  children: [
+                    buildInspectionTextFormFeild(
+                        reportIdController, 'Report Id'),
+                    buildInspectionTextFormFeild(
+                        reportDateController, 'Report Date'),
+                    buildInspectionTextFormFeild(
+                        inspectionDateController, 'Inspection Date'),
+                    buildInspectionTextFormFeild(
+                        inspectionTimeController, 'Inspection Time'),
+                    buildInspectionTextFormFeild(
+                        agentNameController, 'Agent Name'),
+                    buildInspectionTextFormFeild(
+                        agentContactController, 'Agent Contact'),
+                    buildInspectionTextFormFeild(
+                        clientNameController, 'Client Name'),
+                    buildInspectionTextFormFeild(
+                        carNumberController, 'Car Number'),
+                    buildInspectionTextFormFeild(
+                        clientContactController, 'Client Contact'),
+                    buildInspectionTextFormFeild(
+                        overallScoreController, 'Overall Score'),
+                    buildInspectionTextFormFeild(
+                        bodyScoreController, 'Body Score'),
+                    buildInspectionTextFormFeild(
+                        engineScoreController, 'Engine Score'),
+                    buildInspectionTextFormFeild(carMakeController, 'Car Make'),
+                    buildInspectionTextFormFeild(
+                        carModelController, 'Car Model'),
+                    buildInspectionTextFormFeild(
+                        carVarientController, 'Car Varient'),
+                    buildInspectionTextFormFeild(
+                        carRegistrationController, 'Car Registration'),
+                    buildInspectionTextFormFeild(
+                        engineNoController, 'Engine No.'),
+                    buildInspectionTextFormFeild(
+                        chasisNoController, 'Chasis No.'),
+                    buildInspectionTextFormFeild(
+                        carColorController, 'Car Color'),
+                    buildInspectionTextFormFeild(
+                        accidentedController, 'Accidented'),
+                    buildInspectionTextFormFeild(
+                        bodyTypeController, 'Body Type'),
+                    buildInspectionTextFormFeild(
+                        seatingCapacityController, 'Seating Capacity'),
+                    buildInspectionTextFormFeild(
+                        engineCapacityController, 'Engine Capacity'),
+                    buildInspectionTextFormFeild(milageController, 'Milage'),
+                  ],
+                ),
+              ),
+            ),
           ),
         );
       },

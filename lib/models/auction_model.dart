@@ -26,6 +26,7 @@ class AuctionModel {
   List? bids;
   bool? isActive;
   String? winingBid;
+  String? inspectionReport;
 
   AuctionModel({
     required this.id,
@@ -52,6 +53,7 @@ class AuctionModel {
     required this.bids,
     required this.isActive,
     required this.winingBid,
+    required this.inspectionReport,
   });
 
   AuctionModel.fromMap(Map<String, dynamic> map) {
@@ -79,6 +81,7 @@ class AuctionModel {
     bids = map["bids"];
     isActive = map["isActive"];
     winingBid = map["winingBid"];
+    inspectionReport = map["inspectionReport"];
   }
 
   Map<String, dynamic> toMap() {
@@ -107,6 +110,7 @@ class AuctionModel {
       "bids": bids,
       "isActive": isActive,
       "winingBid": winingBid,
+      "inspectionReport": inspectionReport,
     };
   }
 
@@ -209,6 +213,7 @@ class AuctionModel {
       bids: [],
       isActive: true,
       winingBid: '',
+      inspectionReport:'',
     ),
     AuctionModel(
       id: '2',
@@ -240,6 +245,7 @@ class AuctionModel {
       features: demoFeatures,
       bids: [],
       isActive: true,
+      inspectionReport:'',
       winingBid: '',
     ),
     AuctionModel(
@@ -272,6 +278,7 @@ class AuctionModel {
       features: demoFeatures,
       bids: [],
       isActive: true,
+      inspectionReport:'',
       winingBid: '',
     ),
   ];

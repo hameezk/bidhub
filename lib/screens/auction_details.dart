@@ -7,7 +7,6 @@ import 'package:bidhub/config/theme.dart';
 import 'package:bidhub/models/auction_model.dart';
 import 'package:bidhub/models/user_model.dart';
 import 'package:bidhub/screens/bidding_page.dart';
-import 'package:bidhub/screens/bids_show.dart';
 import 'package:bidhub/screens/home_screen_seller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -105,9 +104,18 @@ class _AuctionDetailsState extends State<AuctionDetails> {
                     Icons.bookmark_border_sharp,
                     color: textColorDark,
                   ))
-              : Container(
-                  height: 0,
-                ),
+              : (UserModel.loggedinUser!.role == 'Seller')
+                  ? IconButton(
+                      onPressed: () {
+                        withdrawAuction();
+                      },
+                      icon: const Icon(
+                        Icons.delete_forever_outlined,
+                        color: textColorDark,
+                      ))
+                  : Container(
+                      height: 0,
+                    ),
         ],
       ),
       extendBodyBehindAppBar: true,
@@ -310,35 +318,25 @@ class _AuctionDetailsState extends State<AuctionDetails> {
                             backgroundColor:
                                 MaterialStatePropertyAll(containerColor)),
                         onPressed: () {
-                          if (UserModel.loggedinUser!.role == 'Seller') {
-                            navigate(
-                                context,
-                                ShowAllCarBids(
-                                  auctionModel: widget.auctionModel,
-                                ));
+                          if (DateTime.parse(
+                                      widget.auctionModel.startDate ?? '')
+                                  .isBefore(DateTime.now()) &&
+                              DateTime.parse(widget.auctionModel.endDate ?? '')
+                                  .isAfter(DateTime.now())) {
+                            navigate(context,
+                                BiddingPage(auctionModel: widget.auctionModel));
                           } else {
-                            if (DateTime.parse(
-                                        widget.auctionModel.startDate ?? '')
-                                    .isBefore(DateTime.now()) &&
-                                DateTime.parse(
-                                        widget.auctionModel.endDate ?? '')
-                                    .isAfter(DateTime.now())) {
+                            if (DateTime.now().isBefore(DateTime.parse(
+                                widget.auctionModel.startDate ?? ''))) {
+                              showCustomSnackbar(
+                                  context: context,
+                                  content:
+                                      'Bidding event has not started yet!');
+                            } else {
                               navigate(
                                   context,
                                   BiddingPage(
                                       auctionModel: widget.auctionModel));
-                            } else {
-                              if (DateTime.now().isBefore(DateTime.parse(
-                                  widget.auctionModel.startDate ?? ''))) {
-                                showCustomSnackbar(
-                                    context: context,
-                                    content:
-                                        'Bidding event has not started yet!');
-                              } else {
-                                showCustomSnackbar(
-                                    context: context,
-                                    content: 'Bidding event has been ended!');
-                              }
                             }
                           }
                         },
